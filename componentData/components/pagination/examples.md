@@ -81,16 +81,17 @@ const App: React.FC = () => (
 );
 export default App;
 ```
-### 迷你
-迷你版本。
+### 尺寸
+小尺寸和大尺寸的分页控件。
 
 ```tsx
 import React from 'react';
 import type { PaginationProps } from 'antd';
-import { Pagination } from 'antd';
+import { Divider, Flex, Pagination } from 'antd';
 const showTotal: PaginationProps['showTotal'] = (total) => `Total ${total} items`;
 const App: React.FC = () => (
-  <>
+  <Flex vertical gap="middle">
+    <Divider titlePlacement="start">Small</Divider>
     <Pagination size="small" total={50} />
     <Pagination size="small" total={50} showSizeChanger showQuickJumper />
     <Pagination size="small" total={50} showTotal={showTotal} />
@@ -102,7 +103,19 @@ const App: React.FC = () => (
       showSizeChanger
       showQuickJumper
     />
-  </>
+    <Divider titlePlacement="start">Large</Divider>
+    <Pagination size="large" total={50} />
+    <Pagination size="large" total={50} showSizeChanger showQuickJumper />
+    <Pagination size="large" total={50} showTotal={showTotal} />
+    <Pagination
+      size="large"
+      total={50}
+      disabled
+      showTotal={showTotal}
+      showSizeChanger
+      showQuickJumper
+    />
+  </Flex>
 );
 export default App;
 ```
@@ -275,8 +288,8 @@ export default App;
 import React from 'react';
 import { Flex, Pagination } from 'antd';
 import type { PaginationProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(({ css }) => ({
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
   root: css`
     border: 2px dashed #ccc;
     padding: 8px;
@@ -294,10 +307,9 @@ const styleFn: PaginationProps['styles'] = ({ props }) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles } = useStyle();
   const paginationSharedProps: PaginationProps = {
     total: 500,
-    classNames: { root: styles.root },
+    classNames: { root: classNames.root },
   };
   return (
     <Flex vertical gap="middle">
