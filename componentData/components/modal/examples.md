@@ -145,7 +145,7 @@ const App: React.FC = () => {
 export default App;
 ```
 ### 遮罩
-遮罩效果，默认 `blur`。
+遮罩效果。
 
 ```tsx
 import React from 'react';
@@ -161,14 +161,14 @@ const App: React.FC = () => {
       <Space>
         <Button
           onClick={() => {
-            modal.confirm({ ...modalConfig });
+            modal.confirm({ ...modalConfig, mask: { blur: true } });
           }}
         >
-          Default blur
+          blur
         </Button>
         <Button
           onClick={() => {
-            modal.confirm({ ...modalConfig, mask: { blur: false } });
+            modal.confirm(modalConfig);
           }}
         >
           Dimmed mask
@@ -1456,7 +1456,7 @@ export default App;
 import React, { useState } from 'react';
 import { Button, Flex, Modal } from 'antd';
 import type { ModalProps } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 const lineStyle: React.CSSProperties = {
   lineHeight: '28px',
 };
@@ -1474,11 +1474,11 @@ const sharedContent = (
     <div style={lineStyle}>🎨 Powerful theme customization in every detail.</div>
   </>
 );
-const useStyles = createStyles(() => ({
-  container: {
-    borderRadius: 10,
-    padding: 10,
-  },
+const classNames = createStaticStyles(({ css }) => ({
+  container: css`
+    border-radius: 10px;
+    padding: 10px;
+  `,
 }));
 const styles: ModalProps['styles'] = {
   mask: {
@@ -1511,7 +1511,6 @@ const stylesFn: ModalProps['styles'] = (info) => {
 const App: React.FC = () => {
   const [modalOpen, setOpen] = useState(false);
   const [modalFnOpen, setFnOpen] = useState(false);
-  const { styles: classNames } = useStyles();
   const sharedProps: ModalProps = {
     centered: true,
     classNames,
@@ -1607,7 +1606,7 @@ const Demo: React.FC = () => {
         footer={null}
         destroyOnHidden
         onCancel={() => setIsModalOpen(false)}
-        maskClosable={false}
+        mask={{ closable: false }}
         closable={false}
         styles={{
           container: {

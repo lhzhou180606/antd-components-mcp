@@ -442,7 +442,6 @@ export default App;
 搜索和远程数据结合。
 
 ```tsx
-/* eslint-disable compat/compat */
 import React, { useState } from 'react';
 import { Select } from 'antd';
 import type { SelectProps } from 'antd';
@@ -639,6 +638,10 @@ async function fetchUserList(username: string): Promise<UserValue[]> {
         value: user.id,
         avatar: user.avatar,
       }));
+    })
+    .catch(() => {
+      console.log('fetch mock data failed');
+      return [];
     });
 }
 const App: React.FC = () => {
@@ -1693,12 +1696,12 @@ import React from 'react';
 import { MehOutlined } from '@ant-design/icons';
 import { Flex, Select } from 'antd';
 import type { SelectProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    borderRadius: 8,
-    width: 300,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    border-radius: 8px;
+    width: 300px;
+  `,
 }));
 const options: SelectProps['options'] = [
   { value: 'GuangZhou', label: 'GuangZhou' },
@@ -1732,7 +1735,6 @@ const stylesFn: SelectProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: SelectProps = {
     options,
     classNames,

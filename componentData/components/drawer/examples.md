@@ -632,32 +632,33 @@ export default App;
 
 ```tsx
 import React, { useState } from 'react';
-import { Button, Drawer, Space } from 'antd';
+import { Button, Drawer, Radio, Space } from 'antd';
 import type { DrawerProps } from 'antd';
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState<DrawerProps['size']>();
-  const showDefaultDrawer = () => {
-    setSize('default');
-    setOpen(true);
-  };
-  const showLargeDrawer = () => {
-    setSize('large');
-    setOpen(true);
-  };
   const onClose = () => {
     setOpen(false);
   };
   return (
     <>
-      <Space>
-        <Button type="primary" onClick={showDefaultDrawer}>
-          Open Default Size (378px)
-        </Button>
-        <Button type="primary" onClick={showLargeDrawer}>
-          Open Large Size (736px)
-        </Button>
+      <Space style={{ marginBottom: 16 }}>
+        <Radio.Group
+          value={size}
+          onChange={(e) => setSize(e.target.value)}
+          options={[
+            { label: 'Large Size (736px)', value: 'large' },
+            { label: 'Default Size (378px)', value: 'default' },
+            { label: 256, value: 256 },
+            { label: '500px', value: '500px' },
+            { label: '50%', value: '50%' },
+            { label: '20vw', value: '20vw' },
+          ]}
+        />
       </Space>
+      <Button type="primary" onClick={() => setOpen(true)}>
+        Open Drawer
+      </Button>
       <Drawer
         title={`${size} Drawer`}
         placement="right"
@@ -683,7 +684,7 @@ const App: React.FC = () => {
 export default App;
 ```
 ### 遮罩
-遮罩效果，默认 `blur`。
+遮罩效果。
 
 ```tsx
 import React, { useState } from 'react';
@@ -695,8 +696,8 @@ type DrawerConfig = {
   title: string;
 };
 const drawerList: DrawerConfig[] = [
-  { type: 'blur', mask: true, title: 'Default blur' },
-  { type: 'dimmed', mask: { blur: false }, title: 'Dimmed mask' },
+  { type: 'blur', mask: { blur: true }, title: 'blur' },
+  { type: 'dimmed', mask: true, title: 'Dimmed mask' },
   { type: 'none', mask: false, title: 'No mask' },
 ];
 const App: React.FC = () => {
@@ -719,7 +720,7 @@ const App: React.FC = () => {
             {item.title}
           </Button>
           <Drawer
-            title="Drawer blur"
+            title={item.title}
             placement="right"
             mask={item.mask}
             onClose={onClose}
@@ -877,7 +878,7 @@ export default App;
 import React, { useState } from 'react';
 import { Button, Drawer, Flex } from 'antd';
 import type { DrawerProps } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 const lineStyle: React.CSSProperties = {
   lineHeight: '28px',
 };
@@ -895,11 +896,11 @@ const sharedContent = (
     <div style={lineStyle}>🎨 Powerful theme customization in every detail.</div>
   </>
 );
-const useStyles = createStyles(() => ({
-  container: {
-    borderRadius: 10,
-    padding: 10,
-  },
+const classNames = createStaticStyles(({ css }) => ({
+  container: css`
+    border-radius: 10px;
+    padding: 10px;
+  `,
 }));
 const styles: DrawerProps['styles'] = {
   mask: {
@@ -926,7 +927,6 @@ const stylesFn: DrawerProps['styles'] = (info) => {
 const App: React.FC = () => {
   const [drawerOpen, setOpen] = useState(false);
   const [drawerFnOpen, setFnOpen] = useState(false);
-  const { styles: classNames } = useStyles();
   const sharedProps: DrawerProps = {
     classNames,
     size: 500,

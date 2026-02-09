@@ -297,7 +297,7 @@ const App: React.FC = () => (
 export default App;
 ```
 ### 预览遮罩
-遮罩效果，默认 `blur`。
+遮罩效果。
 
 ```tsx
 import React from 'react';
@@ -307,13 +307,13 @@ const App: React.FC = () => {
     <Space>
       <Image
         width={100}
-        alt="Default blur"
+        alt="blur"
         src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
         preview={{
-          mask: true,
+          mask: { blur: true },
           cover: (
             <Space vertical align="center">
-              Default blur
+              blur
             </Space>
           ),
         }}
@@ -323,7 +323,6 @@ const App: React.FC = () => {
         width={100}
         src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
         preview={{
-          mask: { blur: false },
           cover: (
             <Space vertical align="center">
               Dimmed mask
@@ -356,13 +355,13 @@ export default App;
 import React from 'react';
 import { Flex, Image } from 'antd';
 import type { ImageProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    padding: 4,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    padding: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+  `,
 }));
 const styles: ImageProps['styles'] = {
   image: {
@@ -387,7 +386,6 @@ const stylesFn: ImageProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: ImageProps = {
     src: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
     width: 160,
