@@ -442,7 +442,6 @@ export default App;
 搜索和远程数据结合。
 
 ```tsx
-/* eslint-disable compat/compat */
 import React, { useState } from 'react';
 import { Select } from 'antd';
 import type { SelectProps } from 'antd';
@@ -639,6 +638,10 @@ async function fetchUserList(username: string): Promise<UserValue[]> {
         value: user.id,
         avatar: user.avatar,
       }));
+    })
+    .catch(() => {
+      console.log('fetch mock data failed');
+      return [];
     });
 }
 const App: React.FC = () => {
@@ -1157,9 +1160,9 @@ import type { RadioChangeEvent, SelectProps } from 'antd';
 import { Radio, Select } from 'antd';
 type SelectCommonPlacement = SelectProps['placement'];
 const App: React.FC = () => {
-  const [placement, SetPlacement] = useState<SelectCommonPlacement>('topLeft');
+  const [placement, setPlacement] = useState<SelectCommonPlacement>('topLeft');
   const placementChange = (e: RadioChangeEvent) => {
-    SetPlacement(e.target.value);
+    setPlacement(e.target.value);
   };
   return (
     <>
@@ -1213,11 +1216,11 @@ const randomOptions = (count?: number) => {
   }));
 };
 const App: React.FC = () => {
-  const [placement, SetPlacement] = useState<SelectCommonPlacement>('topLeft');
+  const [placement, setPlacement] = useState<SelectCommonPlacement>('topLeft');
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState(() => randomOptions(3));
   const placementChange = (e: RadioChangeEvent) => {
-    SetPlacement(e.target.value);
+    setPlacement(e.target.value);
   };
   return (
     <div
@@ -1265,7 +1268,7 @@ export default App;
 
 ```tsx
 import React from 'react';
-import { Button, Input, Select, Space } from 'antd';
+import { Button, Flex, Input, Select, Space } from 'antd';
 const style: React.CSSProperties = {
   width: 500,
   position: 'relative',
@@ -1277,7 +1280,7 @@ const handleChange = (value: string | string[]) => {
   console.log(`selected ${value}`);
 };
 const App: React.FC = () => (
-  <>
+  <Flex vertical gap="middle">
     <Space style={style} wrap>
       <Input style={{ width: 100 }} value="222" />
       <Select
@@ -1310,8 +1313,21 @@ const App: React.FC = () => (
       />
       <span className="debug-align">AntDesign</span>
       <Button>222</Button>
+      {/* https://github.com/ant-design/ant-design/issues/56960 */}
+      <Select
+        style={{ width: 120 }}
+        defaultValue=" "
+        placeholder="Please select"
+        options={[
+          { value: 'jack', label: 'Jack' },
+          { value: 'lucy', label: 'Lucy' },
+          { value: 'disabled', disabled: true, label: 'Disabled' },
+          { value: 'Yiminghe', label: 'yiminghe' },
+          { value: 'long', label: 'I am super super long!' },
+        ]}
+      />
     </Space>
-    <div style={{ width: 200, marginTop: 24 }}>
+    <div style={{ width: 200 }}>
       {/* https://github.com/ant-design/ant-design/issues/54179 */}
       <Select
         mode="multiple"
@@ -1325,7 +1341,8 @@ const App: React.FC = () => (
         ]}
       />
     </div>
-  </>
+    <Select defaultValue="" />
+  </Flex>
 );
 export default App;
 ```
@@ -1693,12 +1710,12 @@ import React from 'react';
 import { MehOutlined } from '@ant-design/icons';
 import { Flex, Select } from 'antd';
 import type { SelectProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    borderRadius: 8,
-    width: 300,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    border-radius: 8px;
+    width: 300px;
+  `,
 }));
 const options: SelectProps['options'] = [
   { value: 'GuangZhou', label: 'GuangZhou' },
@@ -1732,7 +1749,6 @@ const stylesFn: SelectProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: SelectProps = {
     options,
     classNames,

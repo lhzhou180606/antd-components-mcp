@@ -1171,7 +1171,6 @@ export default App;
 > 🛎️ 想要 3 分钟实现？试试 [ProTable](https://procomponents.ant.design/components/table)！
 
 ```tsx
-/* eslint-disable compat/compat */
 import React, { useEffect, useState } from 'react';
 import type { GetProp, TableProps } from 'antd';
 import { Table } from 'antd';
@@ -1274,6 +1273,9 @@ const App: React.FC = () => {
             // total: data.totalCount,
           },
         });
+      })
+      .catch(() => {
+        console.log('fetch mock data failed');
       });
   };
   useEffect(fetchData, [
@@ -3610,123 +3612,6 @@ const App: React.FC = () => {
 };
 export default App;
 ```
-### 可伸缩列
-集成 [react-resizable](https://github.com/STRML/react-resizable) 来实现可伸缩列。如果有排序需要，可以通过[额外标记](https://codesandbox.io/s/zrj8xvyzxx)阻止触发排序。
-
-```tsx
-import React, { useState } from 'react';
-import { Table } from 'antd';
-import type { TableColumnsType } from 'antd';
-import type { ResizeCallbackData } from 'react-resizable';
-import { Resizable } from 'react-resizable';
-interface DataType {
-  key: React.Key;
-  date: string;
-  amount: number;
-  type: string;
-  note: string;
-}
-interface TitlePropsType {
-  width: number;
-  onResize: (e: React.SyntheticEvent<Element>, data: ResizeCallbackData) => void;
-}
-const ResizableTitle: React.FC<Readonly<React.HTMLAttributes<any> & TitlePropsType>> = (props) => {
-  const { onResize, width, ...restProps } = props;
-  if (!width) {
-    return <th {...restProps} />;
-  }
-  return (
-    <Resizable
-      width={width}
-      height={0}
-      handle={<span className="react-resizable-handle" onClick={(e) => e.stopPropagation()} />}
-      onResize={onResize}
-      draggableOpts={{ enableUserSelectHack: false }}
-    >
-      <th {...restProps} />
-    </Resizable>
-  );
-};
-const data: DataType[] = [
-  {
-    key: 0,
-    date: '2018-02-11',
-    amount: 120,
-    type: 'income',
-    note: 'transfer',
-  },
-  {
-    key: 1,
-    date: '2018-03-11',
-    amount: 243,
-    type: 'income',
-    note: 'transfer',
-  },
-  {
-    key: 2,
-    date: '2018-04-11',
-    amount: 98,
-    type: 'income',
-    note: 'transfer',
-  },
-];
-const App: React.FC = () => {
-  const [columns, setColumns] = useState<TableColumnsType<DataType>>([
-    {
-      title: 'Date',
-      dataIndex: 'date',
-      width: 200,
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      width: 100,
-      sorter: (a, b) => a.amount - b.amount,
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      width: 100,
-    },
-    {
-      title: 'Note',
-      dataIndex: 'note',
-      width: 100,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: () => <a>Delete</a>,
-    },
-  ]);
-  const handleResize =
-    (index: number) =>
-    (_: React.SyntheticEvent<Element>, { size }: ResizeCallbackData) => {
-      const newColumns = [...columns];
-      newColumns[index] = {
-        ...newColumns[index],
-        width: size.width,
-      };
-      setColumns(newColumns);
-    };
-  const mergedColumns = columns.map<TableColumnsType<DataType>[number]>((col, index) => ({
-    ...col,
-    onHeaderCell: (column: TableColumnsType<DataType>[number]) => ({
-      width: column.width,
-      onResize: handleResize(index) as React.ReactEventHandler<any>,
-    }),
-  }));
-  return (
-    <Table<DataType>
-      bordered
-      components={{ header: { cell: ResizableTitle } }}
-      columns={mergedColumns}
-      dataSource={data}
-    />
-  );
-};
-export default App;
-```
 ### 单元格自动省略
 设置 `column.ellipsis` 可以让单元格内容根据宽度自动省略。
 > 列头缩略暂不支持和排序筛选一起使用。
@@ -5020,13 +4905,13 @@ export default App;
 import React from 'react';
 import { Flex, Table } from 'antd';
 import type { TableProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    color: '#e0e0e0',
-    borderRadius: 12,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    color: #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  `,
 }));
 interface DataType {
   key?: string;
@@ -5122,7 +5007,6 @@ const stylesFn: TableProps<DataType>['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: TableProps<DataType> = {
     columns,
     dataSource,

@@ -294,6 +294,88 @@ const App: React.FC = () => {
 };
 export default App;
 ```
+### 菜单项提示
+折叠状态下可配置 `tooltip`，也可以关闭。
+
+```tsx
+import React, { useState } from 'react';
+import {
+  AppstoreOutlined,
+  ContainerOutlined,
+  DesktopOutlined,
+  MailOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  PieChartOutlined,
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Button, Menu, Space, Switch } from 'antd';
+type MenuItem = Required<MenuProps>['items'][number];
+const items: MenuItem[] = [
+  { key: '1', icon: <PieChartOutlined />, label: 'Option 1' },
+  { key: '2', icon: <DesktopOutlined />, label: 'Option 2' },
+  { key: '3', icon: <ContainerOutlined />, label: 'Option 3' },
+  {
+    key: 'sub1',
+    label: 'Navigation One',
+    icon: <MailOutlined />,
+    children: [
+      { key: '5', label: 'Option 5' },
+      { key: '6', label: 'Option 6' },
+      { key: '7', label: 'Option 7' },
+      { key: '8', label: 'Option 8' },
+    ],
+  },
+  {
+    key: 'sub2',
+    label: 'Navigation Two',
+    icon: <AppstoreOutlined />,
+    children: [
+      { key: '9', label: 'Option 9' },
+      { key: '10', label: 'Option 10' },
+      {
+        key: 'sub3',
+        label: 'Submenu',
+        children: [
+          { key: '11', label: 'Option 11' },
+          { key: '12', label: 'Option 12' },
+        ],
+      },
+    ],
+  },
+];
+const App: React.FC = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [tooltipEnabled, setTooltipEnabled] = useState(true);
+  return (
+    <div style={{ width: 256 }}>
+      <Space style={{ marginBottom: 16 }}>
+        <Button
+          type="primary"
+          onClick={() => setCollapsed((prev) => !prev)}
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        />
+        <Switch
+          checked={tooltipEnabled}
+          onChange={setTooltipEnabled}
+          checkedChildren="Tooltip On"
+          unCheckedChildren="Tooltip Off"
+        />
+      </Space>
+      <Menu
+        defaultSelectedKeys={['1']}
+        defaultOpenKeys={['sub1']}
+        mode="inline"
+        theme="dark"
+        inlineCollapsed={collapsed}
+        tooltip={tooltipEnabled ? { placement: 'left' } : false}
+        items={items}
+      />
+    </div>
+  );
+};
+export default App;
+```
 ### 只展开当前父级菜单
 点击菜单，收起其他展开的所有菜单，保持菜单聚焦简洁。
 
@@ -723,10 +805,17 @@ export default App;
 import React from 'react';
 import { Flex, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(() => ({
-  root: { border: '1px solid #f0f0f0', maxWidth: 600, padding: 8, borderRadius: 4 },
-  item: { color: '#1677ff' },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    border: 1px solid #f0f0f0;
+    max-width: 600px;
+    padding: 8px;
+    border-radius: 4px;
+  `,
+  item: css`
+    color: #1677ff;
+  `,
 }));
 const items: Required<MenuProps>['items'] = [
   {
@@ -760,7 +849,6 @@ const stylesFn: MenuProps['styles'] = (info) => {
   } satisfies MenuProps['styles'];
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyle();
   const shareProps: MenuProps = {
     classNames,
     items,
