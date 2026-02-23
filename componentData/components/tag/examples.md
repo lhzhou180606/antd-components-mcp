@@ -238,7 +238,7 @@ const App: React.FC = () => {
   return (
     <Form labelCol={{ span: 6 }}>
       <Form.Item label="Checkable">
-        <Tag.CheckableTag checked={checked} onChange={(val) => setChecked(val)}>
+        <Tag.CheckableTag checked={checked} onChange={setChecked}>
           Yes
         </Tag.CheckableTag>
       </Form.Item>
@@ -246,7 +246,7 @@ const App: React.FC = () => {
         <Tag.CheckableTagGroup
           options={tagsData}
           value={singleSelected}
-          onChange={(val) => setSingleSelected(val)}
+          onChange={setSingleSelected}
         />
       </Form.Item>
       <Form.Item label="Multiple">
@@ -254,7 +254,7 @@ const App: React.FC = () => {
           multiple
           options={tagsData}
           value={multipleSelected}
-          onChange={(val) => setMultipleSelected(val)}
+          onChange={setMultipleSelected}
         />
       </Form.Item>
     </Form>
@@ -747,13 +747,13 @@ import React from 'react';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Flex, Space, Tag } from 'antd';
 import type { GetProps, TagProps } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 type CheckableTagGroupProps = GetProps<typeof Tag.CheckableTagGroup>;
-const useStyles = createStyles(() => ({
-  root: {
-    padding: '2px 6px',
-    borderRadius: 4,
-  },
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    padding: 2px 6px;
+    border-radius: 4px;
+  `,
 }));
 const styles: TagProps['styles'] = {
   root: {
@@ -815,7 +815,6 @@ const groupStylesFn: CheckableTagGroupProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   return (
     <Space size="large" vertical>
       <Flex gap="middle">

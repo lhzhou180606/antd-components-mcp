@@ -401,16 +401,16 @@ export default App;
 ```tsx
 import React from 'react';
 import { Alert, Button, Flex } from 'antd';
-import type { AlertProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(({ css }) => ({
+import type { AlertProps, AlertSemanticType } from 'antd';
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
   root: css`
     border: 2px dashed #ccc;
     border-radius: 8px;
     padding: 12px;
   `,
 }));
-const styleFn: AlertProps['styles'] = ({ props: { type } }) => {
+const styleFn: AlertProps['styles'] = ({ props: { type } }): AlertSemanticType['styles'] => {
   if (type === 'success') {
     return {
       root: {
@@ -420,7 +420,7 @@ const styleFn: AlertProps['styles'] = ({ props: { type } }) => {
       icon: {
         color: '#52c41a',
       },
-    } satisfies AlertProps['styles'];
+    };
   }
   if (type === 'warning') {
     return {
@@ -431,16 +431,15 @@ const styleFn: AlertProps['styles'] = ({ props: { type } }) => {
       icon: {
         color: '#faad14',
       },
-    } satisfies AlertProps['styles'];
+    };
   }
   return {};
 };
 const App: React.FC = () => {
-  const { styles } = useStyle();
   const alertSharedProps: AlertProps = {
     showIcon: true,
     classNames: {
-      root: styles.root,
+      root: classNames.root,
     },
   };
   return (

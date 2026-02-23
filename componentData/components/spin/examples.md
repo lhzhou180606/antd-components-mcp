@@ -64,15 +64,15 @@ const content = <div style={contentStyle} />;
 const App: React.FC = () => (
   <Flex gap="middle" vertical>
     <Flex gap="middle">
-      <Spin tip="Loading" size="small">
+      <Spin description="Loading" size="small">
         {content}
       </Spin>
-      <Spin tip="Loading">{content}</Spin>
-      <Spin tip="Loading" size="large">
+      <Spin description="Loading">{content}</Spin>
+      <Spin description="Loading" size="large">
         {content}
       </Spin>
     </Flex>
-    <Spin tip="Loading...">
+    <Spin description="Loading...">
       <Alert
         title="Alert message title"
         description="Further details about the context of this alert."
@@ -177,8 +177,8 @@ export default App;
 import React from 'react';
 import { Flex, Spin } from 'antd';
 import type { SpinProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(({ css }) => ({
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
   root: css`
     padding: 8px;
   `,
@@ -199,11 +199,10 @@ const stylesFn: SpinProps['styles'] = ({ props }) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles } = useStyle();
   const sharedProps: SpinProps = {
     spinning: true,
     percent: 0,
-    classNames: { root: styles.root },
+    classNames: { root: classNames.root },
   };
   return (
     <Flex align="center" gap="middle">
