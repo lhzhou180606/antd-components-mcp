@@ -7,7 +7,7 @@ import React from 'react';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Space } from 'antd';
 const App: React.FC = () => (
-  <Space size="middle">
+  <Space size="medium">
     <Badge count={5}>
       <Avatar shape="square" size="large" />
     </Badge>
@@ -175,7 +175,7 @@ export default App;
 import React from 'react';
 import { Avatar, Badge, Space } from 'antd';
 const App: React.FC = () => (
-  <Space size="middle">
+  <Space size="medium">
     <Badge size="default" count={5}>
       <Avatar shape="square" size="large" />
     </Badge>
@@ -260,7 +260,7 @@ export default App;
 import React from 'react';
 import { Badge, Card, Space } from 'antd';
 const App: React.FC = () => (
-  <Space vertical size="middle" style={{ width: '100%' }}>
+  <Space vertical size="medium" style={{ width: '100%' }}>
     <Badge.Ribbon text="Hippies">
       <Card title="Pushes open the window" size="small">
         and raises the spyglass.
@@ -312,19 +312,19 @@ export default App;
 import React from 'react';
 import { Avatar, Badge, Card, Flex, Space } from 'antd';
 import type { BadgeProps } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 import type { RibbonProps } from 'antd/es/badge/Ribbon';
-const useStylesBadge = createStyles(() => ({
-  indicator: {
-    fontSize: 10,
-  },
+const badgeClassNames = createStaticStyles(({ css }) => ({
+  indicator: css`
+   font-size: 10px;
+  `,
 }));
-const useStylesRibbon = createStyles(() => ({
-  root: {
-    width: 400,
-    border: '1px solid #d9d9d9',
-    borderRadius: 10,
-  },
+const ribbonClassNames = createStaticStyles(({ css }) => ({
+  root: css`
+    width: 400px;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+  `,
 }));
 const badgeStyles: BadgeProps['styles'] = {
   root: {
@@ -361,11 +361,9 @@ const ribbonStylesFn: RibbonProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: badgeClassNames } = useStylesBadge();
-  const { styles: ribbonClassNames } = useStylesRibbon();
   return (
     <Space size="large" vertical>
-      <Flex gap="middle">
+      <Flex gap="medium">
         <Badge size="small" count={5} classNames={badgeClassNames} styles={badgeStyles}>
           <Avatar shape="square" size="large" />
         </Badge>
@@ -373,7 +371,7 @@ const App: React.FC = () => {
           <Avatar shape="square" size="large" />
         </Badge>
       </Flex>
-      <Flex vertical gap="middle">
+      <Flex vertical gap="medium">
         <Badge.Ribbon text="Custom Ribbon" classNames={ribbonClassNames} styles={ribbonStyles}>
           <Card title="Card with custom ribbon" size="small">
             This card has a customized ribbon with semantic classNames and styles.
@@ -429,8 +427,8 @@ export default App;
 import React from 'react';
 import { Avatar, Badge, Space } from 'antd';
 const App: React.FC = () => (
-  <Space size="middle" wrap>
-    <Space size="middle" wrap>
+  <Space size="medium" wrap>
+    <Space size="medium" wrap>
       <Badge count={5} status="success">
         <Avatar shape="square" size="large" />
       </Badge>
@@ -459,7 +457,7 @@ const App: React.FC = () => (
         <Avatar shape="square" size="large" />
       </Badge>
     </Space>
-    <Space size="middle" wrap>
+    <Space size="medium" wrap>
       <Badge count={0} showZero />
       <Badge count={0} showZero color="blue" />
       <Badge count={0} showZero color="#f0f" />

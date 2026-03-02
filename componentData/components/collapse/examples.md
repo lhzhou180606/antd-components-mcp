@@ -50,9 +50,9 @@ const text = `
 `;
 const App: React.FC = () => (
   <>
-    <Divider titlePlacement="start">Default Size</Divider>
+    <Divider titlePlacement="start">Medium Size</Divider>
     <Collapse
-      items={[{ key: '1', label: 'This is default size panel header', children: <p>{text}</p> }]}
+      items={[{ key: '1', label: 'This is medium size panel header', children: <p>{text}</p> }]}
     />
     <Divider titlePlacement="start">Small Size</Divider>
     <Collapse
@@ -425,14 +425,14 @@ export default App;
 ```tsx
 import React from 'react';
 import { Collapse, Flex } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 import type { CollapseProps } from '..';
-const useStyles = createStyles(() => ({
-  root: {
-    backgroundColor: '#fafafa',
-    border: '1px solid #e0e0e0',
-    borderRadius: 8,
-  },
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    background-color: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+  `,
 }));
 const element = (
   <p>
@@ -486,10 +486,9 @@ const stylesFn: CollapseProps['styles'] = ({ props }) => {
   }
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: CollapseProps = { classNames, items };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Collapse {...sharedProps} defaultActiveKey={['1']} styles={styles} />
       <Collapse {...sharedProps} defaultActiveKey={['2']} styles={stylesFn} size="large" />
     </Flex>

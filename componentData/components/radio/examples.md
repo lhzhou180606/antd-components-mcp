@@ -112,6 +112,10 @@ export default App;
 import React, { useState } from 'react';
 import type { RadioChangeEvent } from 'antd';
 import { Input, Radio } from 'antd';
+const labelStyle: React.CSSProperties = {
+  height: 32,
+  lineHeight: '32px',
+};
 const App: React.FC = () => {
   const [value, setValue] = useState(1);
   const onChange = (e: RadioChangeEvent) => {
@@ -123,11 +127,12 @@ const App: React.FC = () => {
       onChange={onChange}
       value={value}
       options={[
-        { value: 1, label: 'Option A' },
-        { value: 2, label: 'Option B' },
-        { value: 3, label: 'Option C' },
+        { value: 1, style: labelStyle, label: 'Option A' },
+        { value: 2, style: labelStyle, label: 'Option B' },
+        { value: 3, style: labelStyle, label: 'Option C' },
         {
           value: 4,
+          style: labelStyle,
           label: (
             <>
               More...
@@ -160,7 +165,7 @@ const options: CheckboxGroupProps<string>['options'] = [
   { label: 'Orange', value: 'Orange' },
 ];
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Radio.Group block options={options} defaultValue="Apple" />
     <Radio.Group
       block
@@ -247,7 +252,7 @@ const onChange = (e: RadioChangeEvent) => {
   console.log(`radio checked:${e.target.value}`);
 };
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Radio.Group onChange={onChange} defaultValue="a">
       <Radio.Button value="a">Hangzhou</Radio.Button>
       <Radio.Button value="b">Shanghai</Radio.Button>
@@ -299,7 +304,7 @@ export default App;
 import React from 'react';
 import { Flex, Radio } from 'antd';
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Radio.Group defaultValue="a" size="large">
       <Radio.Button value="a">Hangzhou</Radio.Button>
       <Radio.Button value="b">Shanghai</Radio.Button>
@@ -329,7 +334,7 @@ export default App;
 import React from 'react';
 import { Flex, Radio } from 'antd';
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Radio.Group defaultValue="a" buttonStyle="solid">
       <Radio.Button value="a">Hangzhou</Radio.Button>
       <Radio.Button value="b">Shanghai</Radio.Button>
@@ -356,38 +361,70 @@ import React from 'react';
 import { Flex, Radio } from 'antd';
 import type { RadioProps } from 'antd';
 import { createStyles } from 'antd-style';
-const useStyles = createStyles(({ token }) => ({
-  root: {
-    borderRadius: token.borderRadius,
-    borderWidth: 1,
-    width: 300,
-  },
+import clsx from 'clsx';
+const useStyles = createStyles(({ token, css }) => ({
+  root: css`
+    border-radius: ${token.borderRadius}px;
+    background-color: ${token.colorBgContainer};
+  `,
+  icon: css`
+    border-color: ${token.colorWarning};
+  `,
+  label: css`
+    color: ${token.colorTextDisabled};
+    font-weight: bold;
+  `,
+  iconChecked: css`
+    background-color: ${token.colorWarning};
+  `,
+  labelChecked: css`
+    color: ${token.colorWarning};
+  `,
 }));
+// Object style
 const styles: RadioProps['styles'] = {
-  root: {
-    padding: 8,
-    borderRadius: 4,
-    borderColor: '#ccc',
+  icon: {
+    borderRadius: 6,
   },
-};
-const stylesFn: RadioProps['styles'] = (info) => {
-  if (info.props.checked) {
-    return {
-      root: { padding: 8, borderRadius: 4, borderColor: '#1890ff' },
-      label: { fontWeight: 'bold', color: '#333' },
-    } satisfies RadioProps['styles'];
-  }
-  return {};
+  label: {
+    color: 'blue',
+  },
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
+  const [value, setValue] = React.useState<'styles' | 'classNames'>('styles');
+  const { styles: classNamesStyles } = useStyles();
+  // Function classNames - dynamically adjust based on checked state
+  const classNamesFn: RadioProps['classNames'] = (info) => {
+    if (info.props.checked) {
+      return {
+        root: clsx(classNamesStyles.root),
+        icon: clsx(classNamesStyles.icon, classNamesStyles.iconChecked),
+        label: clsx(classNamesStyles.label, classNamesStyles.labelChecked),
+      };
+    }
+    return {
+      root: classNamesStyles.root,
+      icon: classNamesStyles.icon,
+      label: classNamesStyles.label,
+    };
+  };
   return (
-    <Flex vertical gap="middle">
-      <Radio classNames={classNames} styles={styles}>
-        Object
+    <Flex vertical gap="medium">
+      <Radio
+        name="style-class"
+        styles={styles}
+        checked={value === 'styles'}
+        onChange={() => setValue('styles')}
+      >
+        Object styles
       </Radio>
-      <Radio classNames={classNames} styles={stylesFn} checked>
-        Function
+      <Radio
+        name="style-class"
+        classNames={classNamesFn}
+        checked={value === 'classNames'}
+        onChange={() => setValue('classNames')}
+      >
+        Function classNames
       </Radio>
     </Flex>
   );

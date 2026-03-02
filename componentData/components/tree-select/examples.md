@@ -441,9 +441,9 @@ const treeData = [
   },
 ];
 const App: React.FC = () => {
-  const [placement, SetPlacement] = useState<SelectCommonPlacement>('topLeft');
+  const [placement, setPlacement] = useState<SelectCommonPlacement>('topLeft');
   const placementChange = (e: RadioChangeEvent) => {
-    SetPlacement(e.target.value);
+    setPlacement(e.target.value);
   };
   return (
     <>
@@ -490,7 +490,7 @@ const style: React.CSSProperties = {
 };
 const App: React.FC = () => {
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <TreeSelect style={style} placeholder="Please select" variant="borderless" />
       <TreeSelect style={style} placeholder="Please select" variant="filled" />
       <TreeSelect style={style} placeholder="Please select" variant="outlined" />
@@ -702,7 +702,7 @@ const styleObject: TreeSelectProps['styles'] = {
   },
 };
 const styleFunction: TreeSelectProps['styles'] = (info) => {
-  if (info.props.size === 'middle') {
+  if (info.props.size === 'medium') {
     return {
       suffix: {
         color: '#722ed1',
@@ -757,7 +757,7 @@ const App: React.FC = () => {
   return (
     <Flex vertical gap="large">
       <TreeSelect {...sharedProps} styles={styleObject} placeholder="Object" />
-      <TreeSelect {...sharedProps} styles={styleFunction} placeholder="Function" size="middle" />
+      <TreeSelect {...sharedProps} styles={styleFunction} placeholder="Function" size="medium" />
     </Flex>
   );
 };

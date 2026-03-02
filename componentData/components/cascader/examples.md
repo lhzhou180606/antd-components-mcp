@@ -999,11 +999,11 @@ const options: Option[] = [
   },
 ];
 const App: React.FC = () => {
-  const [placement, SetPlacement] = useState<'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight'>(
+  const [placement, setPlacement] = useState<'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight'>(
     'topLeft',
   );
   const placementChange = (e: RadioChangeEvent) => {
-    SetPlacement(e.target.value);
+    setPlacement(e.target.value);
   };
   return (
     <>
@@ -1028,7 +1028,7 @@ Cascader 形态变体，可选 `outlined` `filled` `borderless` `underlined` 四
 import React from 'react';
 import { Cascader, Flex } from 'antd';
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Cascader placeholder="Please select" variant="borderless" />
     <Cascader placeholder="Please select" variant="filled" />
     <Cascader placeholder="Please select" variant="outlined" />
@@ -1137,7 +1137,7 @@ const onChange: CascaderProps<Option>['onChange'] = (value) => {
 const App: React.FC = () => {
   const { styles: classNames } = useStyles();
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Cascader
         options={options}
         onChange={onChange}

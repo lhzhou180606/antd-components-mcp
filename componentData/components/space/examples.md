@@ -27,7 +27,7 @@ export default App;
 import React from 'react';
 import { Card, Space } from 'antd';
 const App: React.FC = () => (
-  <Space orientation="vertical" size="middle" style={{ display: 'flex' }}>
+  <Space orientation="vertical" size="medium" style={{ display: 'flex' }}>
     <Card title="Card" size="small">
       <p>Card content</p>
       <p>Card content</p>
@@ -45,7 +45,7 @@ const App: React.FC = () => (
 export default App;
 ```
 ### 间距大小
-使用 `size` 设置元素之间的间距，预设了 `small`、`middle`、`large` 三种尺寸，也可以自定义间距，若不设置 `size`，则默认为 `small`。
+使用 `size` 设置元素之间的间距，预设了 `small`、`medium`、`large` 三种尺寸，也可以自定义间距，若不设置 `size`，则默认为 `small`。
 
 ```tsx
 import React, { useState } from 'react';
@@ -58,7 +58,7 @@ const App: React.FC = () => {
   return (
     <>
       <Radio.Group value={size} onChange={(e) => setSize(e.target.value)}>
-        {['small', 'middle', 'large', 'customize'].map((item) => (
+        {['small', 'medium', 'large', 'customize'].map((item) => (
           <Radio key={item} value={item}>
             {item}
           </Radio>
@@ -540,6 +540,11 @@ const App: React.FC = () => (
       <Button type="primary">Button 2</Button>
       <Button type="primary">Button 3</Button>
     </Space.Compact>
+    <Space.Compact orientation="vertical">
+      <Button variant="outlined">Button 1</Button>
+      <Button variant="outlined">Button 2</Button>
+      <Button variant="outlined">Button 3</Button>
+    </Space.Compact>
   </Space>
 );
 export default App;
@@ -795,9 +800,9 @@ export default App;
 ```tsx
 import React from 'react';
 import { CopyOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Cascader, Input, InputNumber, Select, Space, TimePicker } from 'antd';
+import { Button, Cascader, Flex, Input, InputNumber, Select, Space, TimePicker } from 'antd';
 const App: React.FC = () => (
-  <>
+  <Flex vertical gap="medium">
     <Space.Compact block>
       <Space.Compact>
         <Space.Compact>
@@ -827,12 +832,13 @@ const App: React.FC = () => (
         </Space.Compact>
       </Space.Compact>
     </Space.Compact>
-    <br />
     <Space.Compact block>
       <Space.Compact>
         <TimePicker />
         <Button type="primary">Submit</Button>
       </Space.Compact>
+      <Button type="primary">~</Button>
+      <Button type="primary">~</Button>
       <Space.Compact>
         <Cascader
           options={[
@@ -874,7 +880,21 @@ const App: React.FC = () => (
         <Button type="primary">Submit</Button>
       </Space.Compact>
     </Space.Compact>
-  </>
+    <Space.Compact>
+      <Button color="default" variant="solid">
+        Button 1
+      </Button>
+      <Button color="default" variant="solid">
+        Button 2
+      </Button>
+      <Button color="danger" variant="solid">
+        Button 3
+      </Button>
+      <Button color="danger" variant="solid">
+        Button 4
+      </Button>
+    </Space.Compact>
+  </Flex>
 );
 export default App;
 ```

@@ -41,7 +41,7 @@ const App: React.FC = () => {
   const [sizes, setSizes] = React.useState<(number | string)[]>(['50%', '50%']);
   const [enabled, setEnabled] = React.useState(true);
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Splitter
         onResize={setSizes}
         style={{ height: 200, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}
@@ -53,7 +53,7 @@ const App: React.FC = () => {
           <Desc text="Second" />
         </Splitter.Panel>
       </Splitter>
-      <Flex gap="middle" justify="space-between">
+      <Flex gap="medium" justify="space-between">
         <Switch
           value={enabled}
           onChange={() => setEnabled(!enabled)}
@@ -117,7 +117,7 @@ const CustomSplitter: React.FC<Readonly<SplitterProps>> = ({ style, ...restProps
   </Splitter>
 );
 const App: React.FC = () => (
-  <Flex gap="middle" vertical>
+  <Flex gap="medium" vertical>
     <CustomSplitter style={{ height: 200 }} />
     <CustomSplitter style={{ height: 300 }} orientation="vertical" />
   </Flex>
@@ -380,7 +380,7 @@ export default App;
 import React from 'react';
 import { Flex, Splitter, Typography } from 'antd';
 import type { SplitterProps } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 const Desc: React.FC<Readonly<{ text?: string | number; style?: React.CSSProperties }>> = (
   props,
 ) => {
@@ -392,7 +392,7 @@ const Desc: React.FC<Readonly<{ text?: string | number; style?: React.CSSPropert
     </Flex>
   );
 };
-const useStyle = createStyles(({ css, cssVar }) => ({
+const styles = createStaticStyles(({ css, cssVar }) => ({
   boxShadow: css`
     box-shadow: ${cssVar.boxShadowSecondary};
   `,
@@ -414,7 +414,6 @@ const stylesFn: SplitterProps['styles'] = ({ props }) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles } = useStyle();
   const splitSharedProps: SplitterProps = {
     style: { height: 200 },
     classNames: { root: styles.boxShadow },
@@ -438,6 +437,45 @@ const App: React.FC = () => {
         </Splitter.Panel>
       </Splitter>
     </Flex>
+  );
+};
+export default App;
+```
+### 双击重置
+双击拖拽条 Splitter.Panel 重置为默认大小。
+
+```tsx
+import React, { useState } from 'react';
+import { Flex, Splitter, Typography } from 'antd';
+const defaultSizes = ['30%', '40%', '30%'];
+const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
+  <Flex justify="center" align="center" style={{ height: '100%' }}>
+    <Typography.Title type="secondary" level={5} style={{ whiteSpace: 'nowrap' }}>
+      Panel {props.text}
+    </Typography.Title>
+  </Flex>
+);
+const App: React.FC = () => {
+  const [sizes, setSizes] = useState<(number | string)[]>(defaultSizes);
+  const handleDoubleClick = () => {
+    setSizes(defaultSizes);
+  };
+  return (
+    <Splitter
+      style={{ height: 200, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}
+      onResize={setSizes}
+      onDraggerDoubleClick={handleDoubleClick}
+    >
+      <Splitter.Panel size={sizes[0]}>
+        <Desc text={1} />
+      </Splitter.Panel>
+      <Splitter.Panel size={sizes[1]}>
+        <Desc text={2} />
+      </Splitter.Panel>
+      <Splitter.Panel size={sizes[2]}>
+        <Desc text={3} />
+      </Splitter.Panel>
+    </Splitter>
   );
 };
 export default App;
@@ -512,7 +550,7 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
   </Flex>
 );
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Typography.Title level={3}>[true, 0, false]</Typography.Title>
     <Splitter style={{ height: 200, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
       <Splitter.Panel>

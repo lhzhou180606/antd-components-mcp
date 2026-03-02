@@ -44,7 +44,7 @@ import React from 'react';
 import { Flex, QRCode } from 'antd';
 const value = 'https://ant.design';
 const App: React.FC = () => (
-  <Flex gap="middle" wrap>
+  <Flex gap="medium" wrap>
     <QRCode value={value} status="loading" />
     <QRCode value={value} status="expired" onRefresh={() => console.log('refresh')} />
     <QRCode value={value} status="scanned" />
@@ -92,7 +92,7 @@ const customStatusRender: QRCodeProps['statusRender'] = (info) => {
   }
 };
 const App: React.FC = () => (
-  <Flex gap="middle" wrap>
+  <Flex gap="medium" wrap>
     <QRCode value={value} status="loading" statusRender={customStatusRender} />
     <QRCode
       value={value}
@@ -288,13 +288,13 @@ export default App;
 import React from 'react';
 import { Flex, QRCode } from 'antd';
 import type { QRCodeProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    border: '1px solid #ccc',
-    borderRadius: 8,
-    padding: 16,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+  `,
 }));
 const stylesObject: QRCodeProps['styles'] = {
   root: {
@@ -317,14 +317,13 @@ const stylesFunction: QRCodeProps['styles'] = (info) => {
   }
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: QRCodeProps = {
     value: 'https://ant.design/',
     size: 160,
     classNames,
   };
   return (
-    <Flex gap="middle">
+    <Flex gap="medium">
       <QRCode {...sharedProps} styles={stylesObject} />
       <QRCode
         {...sharedProps}
