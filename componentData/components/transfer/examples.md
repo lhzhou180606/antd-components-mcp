@@ -141,8 +141,8 @@ const App: React.FC = () => {
   const [mockData, setMockData] = useState<RecordType[]>([]);
   const [targetKeys, setTargetKeys] = useState<TransferProps['targetKeys']>([]);
   const getMock = () => {
-    const tempTargetKeys = [];
-    const tempMockData = [];
+    const tempTargetKeys: React.Key[] = [];
+    const tempMockData: RecordType[] = [];
     for (let i = 0; i < 20; i++) {
       const data = {
         key: i.toString(),
@@ -200,8 +200,8 @@ const App: React.FC = () => {
   const [mockData, setMockData] = useState<RecordType[]>([]);
   const [targetKeys, setTargetKeys] = useState<TransferProps['targetKeys']>([]);
   const getMock = () => {
-    const tempTargetKeys = [];
-    const tempMockData = [];
+    const tempTargetKeys: React.Key[] = [];
+    const tempMockData: RecordType[] = [];
     for (let i = 0; i < 20; i++) {
       const data = {
         key: i.toString(),
@@ -282,8 +282,8 @@ const App: React.FC = () => {
   const [mockData, setMockData] = useState<RecordType[]>([]);
   const [targetKeys, setTargetKeys] = useState<React.Key[]>([]);
   const getMock = () => {
-    const tempTargetKeys = [];
-    const tempMockData = [];
+    const tempTargetKeys: React.Key[] = [];
+    const tempMockData: RecordType[] = [];
     for (let i = 0; i < 20; i++) {
       const data = {
         key: i.toString(),
@@ -462,8 +462,8 @@ const App: React.FC = () => {
   const [mockData, setMockData] = useState<RecordType[]>([]);
   const [targetKeys, setTargetKeys] = useState<React.Key[]>([]);
   useEffect(() => {
-    const newTargetKeys = [];
-    const newMockData = [];
+    const newTargetKeys: React.Key[] = [];
+    const newMockData: RecordType[] = [];
     for (let i = 0; i < 2000; i++) {
       const data = {
         key: i.toString(),
@@ -606,7 +606,7 @@ const App: React.FC = () => {
     setDisabled(checked);
   };
   return (
-    <Flex align="start" gap="middle" vertical>
+    <Flex align="start" gap="medium" vertical>
       <TableTransfer
         dataSource={mockData}
         targetKeys={targetKeys}
@@ -733,7 +733,7 @@ export default App;
 import React from 'react';
 import { Flex, Transfer } from 'antd';
 const App: React.FC = () => (
-  <Flex gap="middle" vertical>
+  <Flex gap="medium" vertical>
     <Transfer status="error" />
     <Transfer status="warning" showSearch />
   </Flex>
