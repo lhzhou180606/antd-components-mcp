@@ -445,11 +445,11 @@ export default App;
 import React from 'react';
 import { Button, Flex, Tooltip } from 'antd';
 import type { TooltipProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  container: {
-    padding: 10,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  container: css`
+    padding: 10px;
+  `,
 }));
 const styles: TooltipProps['styles'] = {
   container: {
@@ -471,9 +471,8 @@ const stylesFn: TooltipProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   return (
-    <Flex gap="middle">
+    <Flex gap="medium">
       <Tooltip classNames={classNames} styles={styles} arrow={false} title="Object text">
         <Button>Object Style</Button>
       </Tooltip>

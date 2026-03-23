@@ -9,14 +9,14 @@ const App: React.FC = () => <Input placeholder="Basic usage" />;
 export default App;
 ```
 ### 三种大小
-我们为 `<Input />` 输入框定义了三种尺寸（大、默认、小），高度分别为 `40px`、`32px` 和 `24px`。
+我们为 `<Input />` 输入框定义了三种尺寸（大、中、小），高度分别为 `40px`、`32px` 和 `24px`。
 
 ```tsx
 import React from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { Flex, Input } from 'antd';
 const App: React.FC = () => (
-  <Flex vertical gap="middle">
+  <Flex vertical gap="medium">
     <Input size="large" placeholder="large size" prefix={<UserOutlined />} />
     <Input placeholder="default size" prefix={<UserOutlined />} />
     <Input size="small" placeholder="small size" prefix={<UserOutlined />} />
@@ -175,7 +175,7 @@ const options = [
   },
 ];
 const App: React.FC = () => (
-  <Space vertical size="middle">
+  <Space vertical size="medium">
     <Space.Compact>
       <Input defaultValue="26888888" />
     </Space.Compact>
@@ -531,7 +531,7 @@ const App: React.FC = () => {
     onInput,
   };
   return (
-    <Flex gap="middle" align="flex-start" vertical>
+    <Flex gap="medium" align="flex-start" vertical>
       <Title level={5}>With formatter (Upcase)</Title>
       <Input.OTP formatter={(str) => str.toUpperCase()} {...sharedProps} />
       <Title level={5}>With Disabled</Title>
@@ -860,8 +860,8 @@ export default App;
 import React from 'react';
 import { Flex, Input } from 'antd';
 import type { GetProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(({ css, cssVar }) => ({
+import { createStaticStyles } from 'antd-style';
+const styles = createStaticStyles(({ css, cssVar }) => ({
   focusEffect: css`
     border-width: ${cssVar.lineWidth};
     border-radius: ${cssVar.borderRadius};
@@ -882,7 +882,7 @@ type OTPProps = GetProps<typeof Input.OTP>;
 type SearchProps = GetProps<typeof Input.Search>;
 const { Search, TextArea, OTP, Password } = Input;
 const stylesFn: InputProps['styles'] = (info) => {
-  if (info.props.size === 'middle') {
+  if (info.props.size === 'medium') {
     return {
       root: {
         borderColor: '#696FC7',
@@ -902,7 +902,7 @@ const stylesFnTextArea: TextAreaProps['styles'] = (info) => {
   return {};
 };
 const stylesFnPassword: PasswordProps['styles'] = (info) => {
-  if (info.props.size === 'middle') {
+  if (info.props.size === 'medium') {
     return {
       root: {
         borderColor: '#F5D3C4',
@@ -912,7 +912,7 @@ const stylesFnPassword: PasswordProps['styles'] = (info) => {
   return {};
 };
 const stylesFnOTP: OTPProps['styles'] = (info) => {
-  if (info.props.size === 'middle') {
+  if (info.props.size === 'medium') {
     return {
       input: {
         borderColor: '#6E8CFB',
@@ -939,7 +939,7 @@ const stylesFnSearch: SearchProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
+  const classNames = styles;
   return (
     <Flex vertical gap="large">
       <Input
@@ -951,7 +951,7 @@ const App: React.FC = () => {
         classNames={classNames}
         styles={stylesFn}
         placeholder="Function"
-        size="middle"
+        size="medium"
         name="input-fn"
       />
       <TextArea
@@ -965,10 +965,10 @@ const App: React.FC = () => {
         classNames={classNames}
         styles={stylesFnPassword}
         value="Password"
-        size="middle"
+        size="medium"
         name="password-fn"
       />
-      <OTP classNames={classNames} styles={stylesFnOTP} size="middle" length={6} separator="*" />
+      <OTP classNames={classNames} styles={stylesFnOTP} size="medium" length={6} separator="*" />
       <Search
         classNames={classNames}
         styles={stylesFnSearch}
@@ -1106,13 +1106,15 @@ export default App;
 用于多行输入。
 
 ```tsx
-import React, { useState } from 'react';
-import { Button, Input } from 'antd';
+import React, { useRef, useState } from 'react';
+import { Button, Input, Tooltip } from 'antd';
+import type { TextAreaRef } from 'antd/es/input/TextArea';
 const { TextArea } = Input;
 const defaultValue =
   'The autoSize property applies to textarea nodes, and only the height changes automatically. In addition, autoSize can be set to an object, specifying the minimum number of rows and the maximum number of rows. The autoSize property applies to textarea nodes, and only the height changes automatically. In addition, autoSize can be set to an object, specifying the minimum number of rows and the maximum number of rows.';
 const App: React.FC = () => {
   const [autoResize, setAutoResize] = useState(false);
+  const textAreaRef = useRef<TextAreaRef>(null);
   return (
     <>
       <Button onClick={() => setAutoResize(!autoResize)} style={{ marginBottom: 16 }}>
@@ -1127,6 +1129,15 @@ const App: React.FC = () => {
         }}
         showCount
       />
+      <br />
+      <Tooltip title="Debug TextArea with Tooltip">
+        <TextArea
+          ref={textAreaRef}
+          placeholder="TextArea wrapped in Tooltip for debugging"
+          style={{ marginTop: 16 }}
+          onFocus={() => console.log('nativeElement:', textAreaRef.current?.nativeElement)}
+        />
+      </Tooltip>
     </>
   );
 };

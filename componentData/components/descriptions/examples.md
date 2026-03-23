@@ -381,7 +381,7 @@ const items: DescriptionsProps['items'] = [
   },
 ];
 const App: React.FC = () => {
-  const [size, setSize] = useState<'default' | 'middle' | 'small'>('default');
+  const [size, setSize] = useState<'large' | 'medium' | 'small'>('large');
   const onChange = (e: RadioChangeEvent) => {
     console.log('size checked', e.target.value);
     setSize(e.target.value);
@@ -389,8 +389,8 @@ const App: React.FC = () => {
   return (
     <div>
       <Radio.Group onChange={onChange} value={size}>
-        <Radio value="default">default</Radio>
-        <Radio value="middle">middle</Radio>
+        <Radio value="large">large</Radio>
+        <Radio value="medium">medium</Radio>
         <Radio value="small">small</Radio>
       </Radio.Group>
       <br />
@@ -697,11 +697,11 @@ export default App;
 import React from 'react';
 import { Descriptions, Flex } from 'antd';
 import type { DescriptionsProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(() => ({
-  root: {
-    padding: 10,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    padding: 10px;
+  `,
 }));
 const items: DescriptionsProps['items'] = [
   {
@@ -726,7 +726,7 @@ const styles: DescriptionsProps['styles'] = {
   },
 };
 const stylesFn: DescriptionsProps['styles'] = (info) => {
-  if (info.props.size === 'default') {
+  if (info.props.size === 'large') {
     return {
       root: {
         borderRadius: 8,
@@ -738,7 +738,6 @@ const stylesFn: DescriptionsProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyle();
   const descriptionsProps: DescriptionsProps = {
     title: 'User Info',
     items,
@@ -746,9 +745,9 @@ const App: React.FC = () => {
     classNames,
   };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Descriptions {...descriptionsProps} styles={styles} size="small" />
-      <Descriptions {...descriptionsProps} styles={stylesFn} size="default" />
+      <Descriptions {...descriptionsProps} styles={stylesFn} size="large" />
     </Flex>
   );
 };
@@ -865,7 +864,7 @@ const items: DescriptionsProps['items'] = [
   },
 ];
 const App: React.FC = () => {
-  const [size, setSize] = useState<'default' | 'middle' | 'small'>('default');
+  const [size, setSize] = useState<'large' | 'medium' | 'small'>('large');
   const onChange = (e: RadioChangeEvent) => {
     console.log('size checked', e.target.value);
     setSize(e.target.value);
@@ -890,8 +889,8 @@ const App: React.FC = () => {
     >
       <div>
         <Radio.Group onChange={onChange} value={size}>
-          <Radio value="default">default</Radio>
-          <Radio value="middle">middle</Radio>
+          <Radio value="large">large</Radio>
+          <Radio value="medium">medium</Radio>
           <Radio value="small">small</Radio>
         </Radio.Group>
         <br />

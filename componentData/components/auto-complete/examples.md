@@ -393,8 +393,8 @@ export default App;
 import React from 'react';
 import { AutoComplete, Flex } from 'antd';
 import type { AutoCompleteProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(({ css }) => ({
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
   root: css`
     border-radius: 4px;
   `,
@@ -426,7 +426,6 @@ const options: AutoCompleteProps['options'] = [
   { value: 'Meet student' },
 ];
 const App: React.FC = () => {
-  const { styles: classNames } = useStyle();
   const sharedProps: AutoCompleteProps = {
     options,
     classNames: {
@@ -435,7 +434,7 @@ const App: React.FC = () => {
     style: { width: 200 },
   };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <AutoComplete {...sharedProps} placeholder="object styles" styles={stylesObject} />
       <AutoComplete
         {...sharedProps}
@@ -523,7 +522,7 @@ import { AutoComplete, Flex, Select } from 'antd';
 const AutoCompleteAndSelect = () => {
   return (
     <Flex vertical gap={16}>
-      {(['small', 'middle', 'large'] as const).map((size) => (
+      {(['small', 'medium', 'large'] as const).map((size) => (
         <Flex key={size}>
           <Select
             value="centered"

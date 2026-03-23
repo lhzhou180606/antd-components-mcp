@@ -956,7 +956,7 @@ const items: MenuProps['items'] = [
 ];
 const objectStyles: DropdownProps['styles'] = {
   root: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
     border: '1px solid #d9d9d9',
     borderRadius: '4px',
   },
@@ -969,7 +969,7 @@ const objectStyles: DropdownProps['styles'] = {
   },
   itemIcon: {
     color: '#1890ff',
-    marginRight: '8px',
+    marginInlineEnd: '8px',
   },
   itemContent: {
     backgroundColor: 'transparent',
@@ -996,7 +996,7 @@ const App: React.FC = () => {
     classNames: { root: styles.root },
   };
   return (
-    <Flex gap="middle" wrap="wrap">
+    <Flex gap="medium" wrap="wrap">
       <Space vertical size="large">
         <Dropdown {...sharedProps} styles={objectStyles}>
           <Button>

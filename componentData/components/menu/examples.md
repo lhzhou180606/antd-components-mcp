@@ -294,6 +294,88 @@ const App: React.FC = () => {
 };
 export default App;
 ```
+### 菜单项提示
+折叠状态下可配置 `tooltip`，也可以关闭。
+
+```tsx
+import React, { useState } from 'react';
+import {
+  AppstoreOutlined,
+  ContainerOutlined,
+  DesktopOutlined,
+  MailOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  PieChartOutlined,
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Button, Menu, Space, Switch } from 'antd';
+type MenuItem = Required<MenuProps>['items'][number];
+const items: MenuItem[] = [
+  { key: '1', icon: <PieChartOutlined />, label: 'Option 1' },
+  { key: '2', icon: <DesktopOutlined />, label: 'Option 2' },
+  { key: '3', icon: <ContainerOutlined />, label: 'Option 3' },
+  {
+    key: 'sub1',
+    label: 'Navigation One',
+    icon: <MailOutlined />,
+    children: [
+      { key: '5', label: 'Option 5' },
+      { key: '6', label: 'Option 6' },
+      { key: '7', label: 'Option 7' },
+      { key: '8', label: 'Option 8' },
+    ],
+  },
+  {
+    key: 'sub2',
+    label: 'Navigation Two',
+    icon: <AppstoreOutlined />,
+    children: [
+      { key: '9', label: 'Option 9' },
+      { key: '10', label: 'Option 10' },
+      {
+        key: 'sub3',
+        label: 'Submenu',
+        children: [
+          { key: '11', label: 'Option 11' },
+          { key: '12', label: 'Option 12' },
+        ],
+      },
+    ],
+  },
+];
+const App: React.FC = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [tooltipEnabled, setTooltipEnabled] = useState(true);
+  return (
+    <div style={{ width: 256 }}>
+      <Space style={{ marginBottom: 16 }}>
+        <Button
+          type="primary"
+          onClick={() => setCollapsed((prev) => !prev)}
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        />
+        <Switch
+          checked={tooltipEnabled}
+          onChange={setTooltipEnabled}
+          checkedChildren="Tooltip On"
+          unCheckedChildren="Tooltip Off"
+        />
+      </Space>
+      <Menu
+        defaultSelectedKeys={['1']}
+        defaultOpenKeys={['sub1']}
+        mode="inline"
+        theme="dark"
+        inlineCollapsed={collapsed}
+        tooltip={tooltipEnabled ? { placement: 'left' } : false}
+        items={items}
+      />
+    </div>
+  );
+};
+export default App;
+```
 ### 只展开当前父级菜单
 点击菜单，收起其他展开的所有菜单，保持菜单聚焦简洁。
 
@@ -723,10 +805,17 @@ export default App;
 import React from 'react';
 import { Flex, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyle = createStyles(() => ({
-  root: { border: '1px solid #f0f0f0', maxWidth: 600, padding: 8, borderRadius: 4 },
-  item: { color: '#1677ff' },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    border: 1px solid #f0f0f0;
+    max-width: 600px;
+    padding: 8px;
+    border-radius: 4px;
+  `,
+  item: css`
+    color: #1677ff;
+  `,
 }));
 const items: Required<MenuProps>['items'] = [
   {
@@ -760,13 +849,12 @@ const stylesFn: MenuProps['styles'] = (info) => {
   } satisfies MenuProps['styles'];
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyle();
   const shareProps: MenuProps = {
     classNames,
     items,
   };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Menu {...shareProps} styles={styles} />
       <Menu mode="inline" {...shareProps} styles={stylesFn} />
     </Flex>
@@ -1311,7 +1399,7 @@ const App: React.FC = () => {
   const { styles } = useStyles();
   const popupRender: MenuProps['popupRender'] = (_, { item }) => {
     return (
-      <Flex className={styles.navigationPopup} vertical gap="middle">
+      <Flex className={styles.navigationPopup} vertical gap="medium">
         <Typography.Title level={3} className={styles.leadingHeader}>
           {item.title}
         </Typography.Title>
@@ -1347,6 +1435,123 @@ const App: React.FC = () => {
       }}
     >
       <Menu mode="horizontal" items={menuItems} popupRender={popupRender} />
+    </ConfigProvider>
+  );
+};
+export default App;
+```
+### 折叠菜单 icon 对齐
+用于排查折叠态 `collapsedIconSize` 放大后的图标布局。红框是 `item-icon`，蓝框是 `svg`，绿框是隐藏中的文字容器。
+
+```tsx
+import React from 'react';
+import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { ConfigProvider, Menu } from 'antd';
+type MenuItem = Required<MenuProps>['items'][number];
+const items: MenuItem[] = [
+  {
+    key: 'sub1',
+    label: 'Navigation One',
+    icon: <MailOutlined />,
+    children: [
+      {
+        key: 'g1',
+        label: 'Item 1',
+        type: 'group',
+        children: [
+          { key: '1', label: 'Option 1' },
+          { key: '2', label: 'Option 2' },
+        ],
+      },
+      {
+        key: 'g2',
+        label: 'Item 2',
+        type: 'group',
+        children: [
+          { key: '3', label: 'Option 3' },
+          { key: '4', label: 'Option 4' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'sub2',
+    label: 'Navigation Two',
+    icon: <AppstoreOutlined />,
+    children: [
+      { key: '5', label: 'Option 5' },
+      { key: '6', label: 'Option 6' },
+      {
+        key: 'sub3',
+        label: 'Submenu',
+        children: [
+          { key: '7', label: 'Option 7' },
+          { key: '8', label: 'Option 8' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'divider',
+  },
+  {
+    key: 'sub4',
+    label: 'Navigation Three',
+    icon: <SettingOutlined />,
+    children: [
+      { key: '9', label: 'Option 9' },
+      { key: '10', label: 'Option 10' },
+      { key: '11', label: 'Option 11' },
+      { key: '12', label: 'Option 12' },
+    ],
+  },
+  {
+    key: 'grp',
+    label: 'Group',
+    type: 'group',
+    children: [
+      { key: '13', label: 'Option 13' },
+      { key: '14', label: 'Option 14' },
+    ],
+  },
+];
+const App: React.FC = () => {
+  const onClick: MenuProps['onClick'] = (e) => {
+    console.log('click ', e);
+  };
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Menu: {
+            collapsedIconSize: 30,
+          },
+        },
+      }}
+    >
+      <style>{`
+        .menu-collapsed-icon-debug .ant-menu-item,
+        .menu-collapsed-icon-debug .ant-menu-submenu-title {
+          background: rgba(22, 119, 255, 0.06);
+        }
+        .menu-collapsed-icon-debug .ant-menu-item-icon {
+          outline: 1px solid #ff4d4f;
+          background: rgba(255, 77, 79, 0.12);
+        }
+        .menu-collapsed-icon-debug .ant-menu-item-icon svg,
+        .menu-collapsed-icon-debug .ant-menu-submenu-title .anticon svg {
+          outline: 1px solid #1677ff;
+          background: rgba(22, 119, 255, 0.16);
+        }
+        .menu-collapsed-icon-debug .ant-menu-title-content {
+          outline: 1px dashed #52c41a;
+          background: rgba(82, 196, 26, 0.12);
+        }
+      `}</style>
+      <div className="menu-collapsed-icon-debug">
+        <Menu onClick={onClick} mode="inline" inlineCollapsed items={items} />
+      </div>
     </ConfigProvider>
   );
 };

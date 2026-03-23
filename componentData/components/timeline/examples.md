@@ -64,7 +64,7 @@ const App: React.FC = () => {
     setReverse(!reverse);
   };
   return (
-    <Flex vertical gap="middle" align="flex-start">
+    <Flex vertical gap="medium" align="flex-start">
       <Timeline
         reverse={reverse}
         items={[
@@ -98,7 +98,7 @@ export default App;
 import React from 'react';
 import { Flex, Timeline } from 'antd';
 const App: React.FC = () => (
-  <Flex vertical gap="middle" align="flex-start">
+  <Flex vertical gap="medium" align="flex-start">
     <Timeline
       pending="Recording..."
       items={[
@@ -362,40 +362,28 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Timeline, Typography } from 'antd';
+import type { TimelineProps } from 'antd';
+const items: TimelineProps['items'] = [
+  { title: '05:10', content: 'Create a services' },
+  { title: '09:03', content: 'Solve initial network problems' },
+  { content: 'Technical testing' },
+  { title: '11:28', content: 'Network problems being solved' },
+];
 const App: React.FC = () => {
-  const sharedProps = {
-    items: [
-      {
-        title: '05:10',
-        content: 'Create a services',
-      },
-      {
-        title: '09:03',
-        content: 'Solve initial network problems',
-      },
-      {
-        content: 'Technical testing',
-      },
-      {
-        title: '11:28',
-        content: 'Network problems being solved',
-      },
-    ],
-  };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Typography.Title level={5} style={{ margin: 0 }}>
         titleSpan = 100px
       </Typography.Title>
-      <Timeline {...sharedProps} titleSpan="100px" />
+      <Timeline items={items} titleSpan="100px" />
       <Typography.Title level={5} style={{ margin: 0 }}>
         titleSpan = 25%
       </Typography.Title>
-      <Timeline {...sharedProps} titleSpan="25%" />
+      <Timeline items={items} titleSpan="25%" />
       <Typography.Title level={5} style={{ margin: 0 }}>
         titleSpan = 18, mode = end
       </Typography.Title>
-      <Timeline {...sharedProps} titleSpan={18} mode="end" />
+      <Timeline items={items} titleSpan={18} mode="end" />
     </Flex>
   );
 };
@@ -456,12 +444,12 @@ export default App;
 import React from 'react';
 import { Flex, Timeline } from 'antd';
 import type { TimelineProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    padding: 8,
-    borderRadius: 4,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    padding: 8px;
+    border-radius: 4px;
+  `,
 }));
 const styles: TimelineProps['styles'] = {
   itemIcon: {
@@ -483,7 +471,6 @@ const stylesFn: TimelineProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: TimelineProps = {
     classNames,
     items: [
@@ -501,7 +488,7 @@ const App: React.FC = () => {
     ],
   };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Timeline {...sharedProps} orientation="horizontal" styles={styles} />
       <Timeline {...sharedProps} orientation="vertical" styles={stylesFn} />
     </Flex>

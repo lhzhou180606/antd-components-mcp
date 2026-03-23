@@ -552,9 +552,9 @@ const customizeRequiredMark = (label: React.ReactNode, { required }: { required:
 );
 const App: React.FC = () => {
   const [form] = Form.useForm();
-  const [requiredMark, setRequiredMarkType] = useState<RequiredMark>('optional');
+  const [requiredMark, setRequiredMark] = useState<RequiredMark>('optional');
   const onRequiredTypeChange: FormProps<any>['onValuesChange'] = ({ requiredMarkValue }) => {
-    setRequiredMarkType(requiredMarkValue);
+    setRequiredMark(requiredMarkValue);
   };
   return (
     <Form
@@ -609,7 +609,7 @@ import {
 import type { FormProps } from 'antd';
 type SizeType = Parameters<typeof Form>[0]['size'];
 const App: React.FC = () => {
-  const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default');
+  const [componentSize, setComponentSize] = useState<SizeType>('medium');
   const onFormLayoutChange: FormProps<any>['onValuesChange'] = ({ size }) => {
     setComponentSize(size);
   };
@@ -626,7 +626,7 @@ const App: React.FC = () => {
       <Form.Item label="Form Size" name="size">
         <Radio.Group>
           <Radio.Button value="small">Small</Radio.Button>
-          <Radio.Button value="default">Default</Radio.Button>
+          <Radio.Button value="medium">Medium</Radio.Button>
           <Radio.Button value="large">Large</Radio.Button>
         </Radio.Group>
       </Form.Item>
@@ -1836,35 +1836,104 @@ const tailFormItemLayout: FormItemProps = {
     },
   },
 };
+interface PhoneValue {
+  prefix?: string;
+  phone?: string;
+}
+interface PhoneInputProps {
+  id?: string;
+  value?: PhoneValue;
+  onChange?: (value: PhoneValue) => void;
+}
+const PhoneInput: React.FC<PhoneInputProps> = ({ id, value = {}, onChange }) => {
+  const [prefix, setPrefix] = useState('86');
+  const [phone, setPhone] = useState('');
+  const triggerChange = (changedValue: PhoneValue) => {
+    onChange?.({ ...value, ...changedValue });
+  };
+  const onPrefixChange = (newPrefix: string) => {
+    if (!('prefix' in value)) {
+      setPrefix(newPrefix);
+    }
+    triggerChange({ prefix: newPrefix });
+  };
+  const onPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPhone = e.target.value;
+    if (!('phone' in value)) {
+      setPhone(newPhone);
+    }
+    triggerChange({ phone: newPhone });
+  };
+  return (
+    <span id={id}>
+      <Space.Compact block>
+        <Select
+          value={value.prefix || prefix}
+          onChange={onPrefixChange}
+          style={{ width: 70 }}
+          options={[
+            { label: '+86', value: '86' },
+            { label: '+87', value: '87' },
+          ]}
+        />
+        <Input value={value.phone || phone} onChange={onPhoneChange} style={{ width: '100%' }} />
+      </Space.Compact>
+    </span>
+  );
+};
+interface DonationValue {
+  amount?: number;
+  currency?: string;
+}
+interface DonationInputProps {
+  id?: string;
+  value?: DonationValue;
+  onChange?: (value: DonationValue) => void;
+}
+const DonationInput: React.FC<DonationInputProps> = ({ id, value = {}, onChange }) => {
+  const [amount, setAmount] = useState<number>();
+  const [currency, setCurrency] = useState('USD');
+  const triggerChange = (changedValue: DonationValue) => {
+    onChange?.({ ...value, ...changedValue });
+  };
+  const onAmountChange = (newAmount: number | null) => {
+    if (!('amount' in value)) {
+      setAmount(newAmount ?? undefined);
+    }
+    triggerChange({ amount: newAmount ?? undefined });
+  };
+  const onCurrencyChange = (newCurrency: string) => {
+    if (!('currency' in value)) {
+      setCurrency(newCurrency);
+    }
+    triggerChange({ currency: newCurrency });
+  };
+  return (
+    <span id={id}>
+      <Space.Compact block>
+        <InputNumber
+          value={value.amount ?? amount}
+          onChange={onAmountChange}
+          style={{ width: '100%' }}
+        />
+        <Select
+          value={value.currency || currency}
+          onChange={onCurrencyChange}
+          style={{ width: 70 }}
+          options={[
+            { label: '$', value: 'USD' },
+            { label: '¥', value: 'CNY' },
+          ]}
+        />
+      </Space.Compact>
+    </span>
+  );
+};
 const App: React.FC = () => {
   const [form] = Form.useForm();
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
   };
-  const prefixSelector = (
-    <Form.Item name="prefix" noStyle>
-      <Select
-        style={{ width: 70 }}
-        defaultValue={'86'}
-        options={[
-          { label: '+86', value: '86' },
-          { label: '+87', value: '87' },
-        ]}
-      />
-    </Form.Item>
-  );
-  const suffixSelector = (
-    <Form.Item name="suffix" noStyle>
-      <Select
-        style={{ width: 70 }}
-        defaultValue={'USD'}
-        options={[
-          { label: '$', value: 'USD' },
-          { label: '¥', value: 'CNY' },
-        ]}
-      />
-    </Form.Item>
-  );
   const [autoCompleteResult, setAutoCompleteResult] = useState<string[]>([]);
   const onWebsiteChange = (value: string) => {
     setAutoCompleteResult(
@@ -1881,7 +1950,11 @@ const App: React.FC = () => {
       form={form}
       name="register"
       onFinish={onFinish}
-      initialValues={{ residence: ['zhejiang', 'hangzhou', 'xihu'], prefix: '86' }}
+      initialValues={{
+        residence: ['zhejiang', 'hangzhou', 'xihu'],
+        phone: { prefix: '86' },
+        donation: { currency: 'USD' },
+      }}
       style={{ maxWidth: 600 }}
       scrollToFirstError
     >
@@ -1958,22 +2031,14 @@ const App: React.FC = () => {
         label="Phone Number"
         rules={[{ required: true, message: 'Please input your phone number!' }]}
       >
-        {/* Demo only, real usage should wrap as custom component */}
-        <Space.Compact block>
-          {prefixSelector}
-          <Input style={{ width: '100%' }} />
-        </Space.Compact>
+        <PhoneInput />
       </Form.Item>
       <Form.Item
         name="donation"
         label="Donation"
         rules={[{ required: true, message: 'Please input donation amount!' }]}
       >
-        {/* Demo only, real usage should wrap as custom component */}
-        <Space.Compact block>
-          <InputNumber style={{ width: '100%' }} />
-          {suffixSelector}
-        </Space.Compact>
+        <DonationInput />
       </Form.Item>
       <Form.Item
         name="website"
@@ -2592,7 +2657,7 @@ const App: React.FC = () => {
   return (
     <Form
       form={form}
-      name="dependencies"
+      name="dependenciesDemo"
       autoComplete="off"
       style={{ maxWidth: 600 }}
       layout="vertical"
@@ -3276,9 +3341,9 @@ export default App;
 import React from 'react';
 import { AlertFilled, CloseSquareFilled } from '@ant-design/icons';
 import { Button, Form, Input, Mentions, Tooltip } from 'antd';
-import { createStyles, css } from 'antd-style';
+import { createStaticStyles } from 'antd-style';
 import uniqueId from 'lodash/uniqueId';
-const useStyle = createStyles(() => ({
+const classNames = createStaticStyles(({ css }) => ({
   'custom-feedback-icons': css`
     .ant-form-item-feedback-icon {
       pointer-events: all;
@@ -3287,7 +3352,6 @@ const useStyle = createStyles(() => ({
 }));
 const App: React.FC = () => {
   const [form] = Form.useForm();
-  const { styles } = useStyle();
   return (
     <Form
       name="custom-feedback-icons"
@@ -3308,7 +3372,7 @@ const App: React.FC = () => {
       <Form.Item
         name="custom-feedback-test-item"
         label="Test"
-        className={styles['custom-feedback-icons']}
+        className={classNames['custom-feedback-icons']}
         rules={[{ required: true, type: 'email' }, { min: 10 }]}
         help=""
         hasFeedback
@@ -3318,7 +3382,7 @@ const App: React.FC = () => {
       <Form.Item
         name="custom-feedback-test-item2"
         label="Test"
-        className={styles['custom-feedback-icons']}
+        className={classNames['custom-feedback-icons']}
         rules={[{ required: true, type: 'email' }, { min: 10 }]}
         help=""
         hasFeedback={{
@@ -3341,7 +3405,7 @@ const App: React.FC = () => {
       <Form.Item
         name="custom-feedback-test-item3"
         label="Test"
-        className={styles['custom-feedback-icons']}
+        className={classNames['custom-feedback-icons']}
         hasFeedback
         validateStatus="success"
         initialValue="@mention1"

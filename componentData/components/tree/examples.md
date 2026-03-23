@@ -1138,18 +1138,18 @@ export default App;
 import React from 'react';
 import { Flex, Tree } from 'antd';
 import type { TreeProps } from 'antd';
-import { createStyles } from 'antd-style';
-const useStyles = createStyles(() => ({
-  root: {
-    padding: 8,
-    borderRadius: 4,
-  },
-  item: {
-    borderRadius: 2,
-  },
-  itemTitle: {
-    fontSize: 14,
-  },
+import { createStaticStyles } from 'antd-style';
+const classNames = createStaticStyles(({ css }) => ({
+  root: css`
+    padding: 8px;
+    border-radius: 4px;
+  `,
+  item: css`
+    border-radius: 2px;
+  `,
+  itemTitle: css`
+    font-size: 14px;
+  `,
 }));
 const treeData: TreeProps['treeData'] = [
   {
@@ -1199,7 +1199,6 @@ const stylesFn: TreeProps['styles'] = (info) => {
   return {};
 };
 const App: React.FC = () => {
-  const { styles: classNames } = useStyles();
   const sharedProps: TreeProps = {
     treeData,
     classNames,
@@ -1207,7 +1206,7 @@ const App: React.FC = () => {
     checkable: true,
   };
   return (
-    <Flex vertical gap="middle">
+    <Flex vertical gap="medium">
       <Tree {...sharedProps} treeData={treeData} styles={styles} />
       <Tree
         {...sharedProps}
@@ -1219,6 +1218,72 @@ const App: React.FC = () => {
         defaultCheckedKeys={['0-0-0', '0-0-1']}
       />
     </Flex>
+  );
+};
+export default App;
+```
+### 连接线调试
+用于调试 Tree 的 showLine 样式与交互效果。
+
+```tsx
+import React from 'react';
+import { CarryOutOutlined } from '@ant-design/icons';
+import { ConfigProvider, Tree } from 'antd';
+import type { TreeDataNode } from 'antd';
+const treeData: TreeDataNode[] = [
+  {
+    key: 'parent 1',
+    title: 'parent 1',
+    icon: <CarryOutOutlined />,
+    children: [
+      {
+        key: 'parent 1-0',
+        title: 'parent 1-0',
+        icon: <CarryOutOutlined />,
+        children: [
+          {
+            key: 'leaf1',
+            title: 'leaf1',
+            icon: <CarryOutOutlined />,
+          },
+          {
+            key: 'leaf2',
+            title: 'leaf2',
+            icon: <CarryOutOutlined />,
+          },
+        ],
+      },
+      {
+        key: 'parent 1-1',
+        title: 'parent 1-1',
+        icon: <CarryOutOutlined />,
+        children: [
+          {
+            key: 'sss',
+            title: 'sss',
+            icon: <CarryOutOutlined />,
+          },
+        ],
+      },
+    ],
+  },
+];
+const App: React.FC = () => {
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Tree: {
+            titleHeight: 32,
+            switcherSize: 24,
+          },
+        },
+      }}
+    >
+      <Tree showLine defaultExpandAll treeData={treeData} />
+      <Tree showLine defaultExpandAll treeData={treeData} draggable />
+      <Tree showLine defaultExpandAll treeData={treeData} checkable />
+    </ConfigProvider>
   );
 };
 export default App;
