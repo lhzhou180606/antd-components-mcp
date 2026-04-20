@@ -170,7 +170,7 @@ const generateData = (_level: number, _preKey?: React.Key, _tns?: TreeDataNode[]
   const level = _level - 1;
   children.forEach((key, index) => {
     tns[index].children = [];
-    return generateData(level, key, tns[index].children);
+    generateData(level, key, tns[index].children);
   });
 };
 generateData(z);
@@ -332,7 +332,7 @@ const generateData = (_level: number, _preKey?: React.Key, _tns?: TreeDataNode[]
   const level = _level - 1;
   children.forEach((key, index) => {
     tns[index].children = [];
-    return generateData(level, key, tns[index].children);
+    generateData(level, key, tns[index].children);
   });
 };
 generateData(z);
@@ -833,7 +833,7 @@ const generateData = (_level: number, preKey = '0', tns = data): TreeDataNode[] 
   const level = _level - 1;
   children.forEach((key, index) => {
     tns[index].children = [];
-    return generateData(level, key, tns[index].children);
+    generateData(level, key, tns[index].children);
   });
 };
 generateData(z);
@@ -1102,7 +1102,7 @@ const treeData: TreeDataNode[] = [
         ],
       },
       {
-        title: 'parent 1-1',
+        title: 'This is a very very very very long title',
         key: '0-0-1',
         children: [{ title: <span style={{ color: '#1677ff' }}>sss</span>, key: '0-0-1-0' }],
       },
