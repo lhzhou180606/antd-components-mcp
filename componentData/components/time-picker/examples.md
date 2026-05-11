@@ -151,7 +151,7 @@ const onChange: TimePickerProps['onChange'] = (time, timeString) => {
 const App: React.FC = () => <TimePicker onChange={onChange} changeOnScroll needConfirm={false} />;
 export default App;
 ```
-### 色付きポップアップ
+### 彩色弹出层
 将自定义 class 传给 `TimePicker` 弹框。
 
 ```tsx
