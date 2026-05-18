@@ -165,7 +165,7 @@ const App: React.FC = () => (
 export default App;
 ```
 ### 带标签的滑块
-使用 `marks` 属性标注分段式滑块，使用 `value` / `defaultValue` 指定滑块位置。当 `included=false` 时，表明不同标记间为并列关系。当 `step=null` 时，Slider 的可选值仅有 `marks` 标出来的部分。
+使用 `marks` 属性标注分段式滑块，使用 `value` / `defaultValue` 指定滑块位置。当 `included=false` 时，表明不同标记间为并列关系。当 `step=null` 时，Slider 的可选值仅有 `marks`、`min` 和 `max`。
 
 ```tsx
 import React from 'react';
@@ -333,7 +333,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Slider } from 'antd';
-import type { SliderSingleProps } from 'antd';
+import type { GetProp, SliderSingleProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -360,13 +360,15 @@ const stylesObject: SliderSingleProps['styles'] = {
   track: { backgroundImage: 'linear-gradient(180deg, #91caff, #1677ff)' },
   handle: { borderColor: '#1677ff', boxShadow: '0 2px 8px #1677ff' },
 };
-const stylesFn: SliderSingleProps['styles'] = (info) => {
+const stylesFn: SliderSingleProps['styles'] = (
+  info,
+): GetProp<SliderSingleProps, 'styles', 'Return'> => {
   if (info.props.orientation === 'vertical') {
     return {
       root: { height: 300 },
       track: { backgroundImage: 'linear-gradient(180deg, #722cc0, #722ed1)' },
       handle: { borderColor: '#722ed1', boxShadow: '0 2px 8px #722ed1' },
-    } satisfies SliderSingleProps['styles'];
+    };
   }
   return {};
 };
