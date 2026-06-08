@@ -195,7 +195,7 @@ const useStyle = createStyles(({ token, css, cx }) => {
         box-sizing: border-box;
       }
       &:hover:before {
-        background: rgba(0, 0, 0, 0.04);
+        background: ${token.controlItemBgHover};
       }
     `,
     today: css`
@@ -231,7 +231,7 @@ const useStyle = createStyles(({ token, css, cx }) => {
       border-radius: ${token.borderRadiusOuter}px;
       padding: 5px 0;
       &:hover {
-        background: rgba(0, 0, 0, 0.04);
+        background: ${token.controlItemBgHover};
       }
     `,
     monthCellCurrent: css`
@@ -253,10 +253,8 @@ const App: React.FC = () => {
     console.log(value.format('YYYY-MM-DD'), mode);
     setPanelDate(value);
   };
-  const onDateChange: CalendarProps<Dayjs>['onSelect'] = (value, selectInfo) => {
-    if (selectInfo.source === 'date') {
-      setSelectDate(value);
-    }
+  const onDateChange: CalendarProps<Dayjs>['onSelect'] = (value) => {
+    setSelectDate(value);
   };
   const cellRender: CalendarProps<Dayjs>['fullCellRender'] = (date, info) => {
     const d = Lunar.fromDate(date.toDate());
@@ -497,7 +495,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Calendar, Flex } from 'antd';
-import type { CalendarProps } from 'antd';
+import type { CalendarProps, GetProp } from 'antd';
 import { createStyles } from 'antd-style';
 import type { Dayjs } from 'dayjs';
 const useStyles = createStyles(({ token }) => ({
@@ -512,7 +510,9 @@ const stylesObject: CalendarProps<Dayjs>['styles'] = {
     width: 600,
   },
 };
-const stylesFunction: CalendarProps<Dayjs>['styles'] = (info) => {
+const stylesFunction: CalendarProps<Dayjs>['styles'] = (
+  info,
+): GetProp<CalendarProps<Dayjs>, 'styles', 'Return'> => {
   if (info.props.fullscreen) {
     return {
       root: {
@@ -520,7 +520,7 @@ const stylesFunction: CalendarProps<Dayjs>['styles'] = (info) => {
         borderRadius: 10,
         backgroundColor: 'rgba(189,227,195, 0.3)',
       },
-    } satisfies CalendarProps<Dayjs>['styles'];
+    };
   }
 };
 const App: React.FC = () => {

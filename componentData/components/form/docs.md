@@ -141,7 +141,7 @@ Form 通过增量更新方式，只更新被修改的字段相关组件以达到
   </Form.Item>
 </Form>
 ```
-自 `5.20.2` 起，当你希望不要转译 `${}` 时，你可以通过 `\\${}` 来略过：
+自 `5.20.2` 起，当你希望不要转译 `${}` 时，你可以通过 `\\${}` 来跳过：
 ```jsx
 { required: true, message: '${label} is convert, \\${label} is not convert' }
 // good is convert, ${label} is not convert
@@ -387,7 +387,7 @@ type Rule = RuleConfig | ((form: FormInstance) => RuleConfig);
 | pattern | 正则表达式匹配 | RegExp |  |
 | required | 是否为必选字段 | boolean |  |
 | transform | 将字段值转换成目标值后进行校验 | (value) => any |  |
-| type | 类型，常见有 `string` \|`number` \|`boolean` \|`url` \| `email` \| `tel`。更多请参考[此处](https://github.com/react-component/async-validator#type) | string |  |
+| type | 类型，常见有 `string` \| `number` \| `boolean` \| `url` \| `email` \| `tel`。更多请参考[此处](https://github.com/react-component/async-validator#type) | string |  |
 | validateTrigger | 设置触发验证时机，必须是 Form.Item 的 `validateTrigger` 的子集 | string \| string\[] |  |
 | validator | 自定义校验，接收 Promise 作为返回值。[示例](#form-demo-register)参考 | ([rule](#rule), value) => Promise |  |
 | warningOnly | 仅警告，不阻塞表单提交 | boolean | 4.17.0 |
@@ -472,6 +472,8 @@ React 中异步更新会导致受控组件交互行为异常。当用户交互�
 当自定义组件不支持 `ref` 时，Form 无法获取子元素真实 DOM 节点，而通过包裹 Class Component 调用 `findDOMNode` 会在 React Strict Mode 下触发警告。因而我们使用 id 来进行元素定位。
 ### `setFieldsValue` 不会触发 `onFieldsChange` 和 `onValuesChange`？ {#faq-set-fields-no-trigger}
 是的，change 事件仅当用户交互才会触发。该设计是为了防止在 change 事件中调用 `setFieldsValue` 导致的循环问题。如果仅仅需要组件内消费，可以通过 `useWatch` 或者 `Field.renderProps` 来实现。
+### 为什么 `dependencies` 不能响应 `setFieldsValue` 触发的更新？ {#faq-dependencies-set-fields}
+`dependencies` 主要用于字段间的校验联动，依赖字段由用户交互触发更新时，会重新触发当前字段的更新与校验。如果需要根据 `setFieldsValue` 后的值变化来渲染额外内容或切换字段选项，请使用 `shouldUpdate` 或 `useWatch`。
 ### 为什么 Form.Item 嵌套子组件后，不更新表单值？ {#faq-item-nested-update}
 Form.Item 在渲染时会注入 `value` 与 `onChange` 事件给子元素，当你的字段组件被包裹时属性将无法传递。所以以下代码是不会生效的：
 ```jsx

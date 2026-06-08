@@ -33,12 +33,15 @@
 | onChange | 变化回调 | function(value: number \| string \| null) | - | - |
 | onPressEnter | 按下回车的回调 | function(e) | - | - |
 | onStep | 点击上下箭头、键盘、滚轮的回调 | (value: number, info: { offset: number, type: 'up' \| 'down', emitter: 'handler' \| 'keydown' \| 'wheel' }) => void | - | 4.7.0 |
+| ~~bordered~~ | 是否带边框，请使用 `variant` 替代 | boolean | true | - |
 ## Ref
 | 名称 | 说明 | 参数 | 版本 |
 | --- | --- | --- | --- |
 | blur() | 移除焦点 | - |  |
 | focus() | 获取焦点 | (option?: { preventScroll?: boolean, cursor?: 'start' \| 'end' \| 'all' }) | cursor - 5.22.0 |
 | nativeElement | 获取原生 DOM 元素 | - | 5.17.3 |
+## 注意事项 {#notes}
+根据相关问题 [#21158](https://github.com/ant-design/ant-design/issues/21158)、[#17344](https://github.com/ant-design/ant-design/issues/17344)、[#9421](https://github.com/ant-design/ant-design/issues/9421) 以及 [关于 number 输入框的文档](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input/number)，社区似乎不支持在 `<Input />` 属性中原生包含 `type="number"`，因此请根据需要自行添加，并注意强烈建议使用服务端验证，因为客户端验证可能被高级用户修改。
 ## FAQ
 ### 为何受控模式下，`value` 可以超出 `min` 和 `max` 范围？ {#faq-controlled-range}
 在受控模式下，开发者可能自行存储相关数据。如果组件将数据约束回范围内，会导致展示数据与实际存储数据不一致的情况。这使得一些如表单场景存在潜在的数据问题。
