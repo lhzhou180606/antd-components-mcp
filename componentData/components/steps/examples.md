@@ -245,6 +245,7 @@ const steps = [
   },
 ];
 const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const next = () => {
@@ -265,6 +266,7 @@ const App: React.FC = () => {
   };
   return (
     <>
+      {contextHolder}
       <Steps current={current} items={items} />
       <div style={contentStyle}>{steps[current].content}</div>
       <div style={{ marginTop: 24 }}>
@@ -274,7 +276,7 @@ const App: React.FC = () => {
           </Button>
         )}
         {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success('Processing complete!')}>
+          <Button type="primary" onClick={() => messageApi.success('Processing complete!')}>
             Done
           </Button>
         )}
@@ -717,7 +719,7 @@ const App: React.FC = () => (
     renderItem={(item, index) => (
       <List.Item>
         <List.Item.Meta
-          avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+          avatar={<Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />}
           title={<a href="https://ant.design">{item.title}</a>}
           description="Ant Design, a design language for background applications, is refined by Ant UED Team"
         />
@@ -997,7 +999,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Steps } from 'antd';
-import type { StepsProps } from 'antd';
+import type { GetProp, StepsProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
@@ -1010,13 +1012,13 @@ const stylesObject: StepsProps['styles'] = {
   itemIcon: { borderRadius: '30%' },
   itemContent: { fontStyle: 'italic' },
 };
-const stylesFn: StepsProps['styles'] = (info) => {
+const stylesFn: StepsProps['styles'] = (info): GetProp<StepsProps, 'styles', 'Return'> => {
   if (info.props.type === 'navigation') {
     return {
       root: {
         borderColor: '#1890ff',
       },
-    } satisfies StepsProps['styles'];
+    };
   }
   return {};
 };

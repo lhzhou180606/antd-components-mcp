@@ -27,6 +27,15 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 无边框
+通过 `variant="filled"` 隐藏边框。
+
+```tsx
+import React from 'react';
+import { Alert } from 'antd';
+const App: React.FC = () => <Alert title="Info Text" type="info" variant="filled" />;
+export default App;
+```
 ### 可关闭的警告提示
 显示关闭按钮，点击可关闭警告提示。
 
@@ -305,7 +314,7 @@ export default App;
 
 ```tsx
 import React from 'react';
-import { Alert, Button, Space } from 'antd';
+import { Alert, Button, Flex } from 'antd';
 const App: React.FC = () => (
   <>
     <Alert
@@ -336,11 +345,9 @@ const App: React.FC = () => (
       title="Warning Text"
       type="warning"
       action={
-        <Space>
-          <Button type="text" size="small">
-            Done
-          </Button>
-        </Space>
+        <Button type="text" size="small">
+          Done
+        </Button>
       }
       closable
     />
@@ -350,14 +357,14 @@ const App: React.FC = () => (
       description="Info Description Info Description Info Description Info Description"
       type="info"
       action={
-        <Space vertical>
-          <Button size="small" type="primary">
+        <Flex vertical gap="small" style={{ minWidth: 80 }}>
+          <Button size="small" type="primary" block>
             Accept
           </Button>
-          <Button size="small" danger ghost>
+          <Button size="small" danger ghost block>
             Decline
           </Button>
-        </Space>
+        </Flex>
       }
       closable
     />
@@ -401,7 +408,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Alert, Button, Flex } from 'antd';
-import type { AlertProps, AlertSemanticType } from 'antd';
+import type { AlertProps, GetProp } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -410,7 +417,9 @@ const classNames = createStaticStyles(({ css }) => ({
     padding: 12px;
   `,
 }));
-const styleFn: AlertProps['styles'] = ({ props: { type } }): AlertSemanticType['styles'] => {
+const styleFn: AlertProps['styles'] = ({
+  props: { type },
+}): GetProp<AlertProps, 'styles', 'Return'> => {
   if (type === 'success') {
     return {
       root: {
