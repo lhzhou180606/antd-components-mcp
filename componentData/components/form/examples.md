@@ -712,12 +712,13 @@ export default App;
 import React from 'react';
 import { Button, Form, Input, message, Space } from 'antd';
 const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const onFinish = () => {
-    message.success('Submit success!');
+    messageApi.success('Submit success!');
   };
   const onFinishFailed = () => {
-    message.error('Submit failed!');
+    messageApi.error('Submit failed!');
   };
   const onFill = () => {
     form.setFieldsValue({
@@ -725,31 +726,38 @@ const App: React.FC = () => {
     });
   };
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-    >
-      <Form.Item
-        name="url"
-        label="URL"
-        rules={[{ required: true }, { type: 'url', warningOnly: true }, { type: 'string', min: 6 }]}
+    <>
+      {contextHolder}
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
       >
-        <Input placeholder="input placeholder" />
-      </Form.Item>
-      <Form.Item>
-        <Space>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-          <Button htmlType="button" onClick={onFill}>
-            Fill
-          </Button>
-        </Space>
-      </Form.Item>
-    </Form>
+        <Form.Item
+          name="url"
+          label="URL"
+          rules={[
+            { required: true },
+            { type: 'url', warningOnly: true },
+            { type: 'string', min: 6 },
+          ]}
+        >
+          <Input placeholder="input placeholder" />
+        </Form.Item>
+        <Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+            <Button htmlType="button" onClick={onFill}>
+              Fill
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </>
   );
 };
 export default App;
@@ -976,7 +984,7 @@ const App: React.FC = () => {
             {fields.map((field, index) => (
               <Form.Item
                 {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-                label={index === 0 ? 'Passengers' : ''}
+                label={index === 0 ? 'Passengers' : undefined}
                 required={false}
                 key={field.key}
               >
@@ -1477,6 +1485,7 @@ export default App;
 ```
 ### 表单数据存储于上层组件
 通过 `onFieldsChange` 和 `fields`，可以把表单的数据存储到上层组件或者 [Redux](https://github.com/reactjs/redux)、[dva](https://github.com/dvajs/dva) 中，更多可参考 [rc-field-form 示例](https://rc-field-form.react-component.now.sh/?selectedKind=rc-field-form&selectedStory=StateForm-redux&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)。
+`onFieldsChange` 返回扁平的 `FieldData[]`。当字段名为数组路径时，`FieldData.name` 会保留该路径，而不是转换为嵌套对象，便于在外部状态中逐项处理字段。
 **注意：** 将表单数据存储于外部容器[并非好的实践](https://github.com/reduxjs/redux/issues/1287#issuecomment-175351978)，如无必要请避免使用。
 
 ```tsx
@@ -1485,7 +1494,7 @@ import { Form, Input, Typography } from 'antd';
 const { Paragraph } = Typography;
 interface FieldData {
   name: string | number | (string | number)[];
-  value?: any;
+  value?: unknown;
   touched?: boolean;
   validating?: boolean;
   errors?: string[];
@@ -1510,10 +1519,16 @@ const CustomizedForm: React.FC<CustomizedFormProps> = ({ onChange, fields }) => 
     >
       <Input />
     </Form.Item>
+    <Form.Item name={['profile', 'email']} label="Email">
+      <Input />
+    </Form.Item>
   </Form>
 );
 const App: React.FC = () => {
-  const [fields, setFields] = useState<FieldData[]>([{ name: ['username'], value: 'Ant Design' }]);
+  const [fields, setFields] = useState<FieldData[]>([
+    { name: ['username'], value: 'Ant Design' },
+    { name: ['profile', 'email'], value: 'antd@example.com' },
+  ]);
   return (
     <>
       <CustomizedForm
@@ -2963,7 +2978,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Button, Form, Input, Space } from 'antd';
-import type { FormProps } from 'antd';
+import type { FormProps, GetProp } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
@@ -2985,7 +3000,7 @@ const stylesObject: FormProps['styles'] = {
     paddingInlineStart: 12,
   },
 };
-const stylesFunction: FormProps['styles'] = (info) => {
+const stylesFunction: FormProps['styles'] = (info): GetProp<FormProps, 'styles', 'Return'> => {
   if (info.props.variant === 'filled') {
     return {
       root: {
@@ -2998,7 +3013,7 @@ const stylesFunction: FormProps['styles'] = (info) => {
       content: {
         paddingInlineStart: 12,
       },
-    } satisfies FormProps['styles'];
+    };
   }
   return {};
 };
@@ -3189,7 +3204,7 @@ const sharedItem = (
       <a
         href="https://github.com/ant-design/ant-design/issues/36459"
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
       >
         #36459
       </a>
