@@ -42,7 +42,7 @@ import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Space, Switch } from 'antd';
 const App: React.FC = () => (
   <Space vertical>
-    <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked />
+    <Switch checkedChildren="On" unCheckedChildren="Off" defaultChecked />
     <Switch checkedChildren="1" unCheckedChildren="0" />
     <Switch
       checkedChildren={<CheckOutlined />}
@@ -122,7 +122,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Switch } from 'antd';
-import type { SwitchProps } from 'antd';
+import type { GetProp, SwitchProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyle = createStyles(({ token }) => ({
   root: {
@@ -135,13 +135,13 @@ const stylesObject: SwitchProps['styles'] = {
     backgroundColor: '#F5D2D2',
   },
 };
-const stylesFn: SwitchProps['styles'] = (info) => {
+const stylesFn: SwitchProps['styles'] = (info): GetProp<SwitchProps, 'styles', 'Return'> => {
   if (info.props.size === 'medium') {
     return {
       root: {
         backgroundColor: '#BDE3C3',
       },
-    } satisfies SwitchProps['styles'];
+    };
   }
   return {};
 };

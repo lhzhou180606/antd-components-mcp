@@ -712,12 +712,13 @@ export default App;
 import React from 'react';
 import { Button, Form, Input, message, Space } from 'antd';
 const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const onFinish = () => {
-    message.success('Submit success!');
+    messageApi.success('Submit success!');
   };
   const onFinishFailed = () => {
-    message.error('Submit failed!');
+    messageApi.error('Submit failed!');
   };
   const onFill = () => {
     form.setFieldsValue({
@@ -725,31 +726,38 @@ const App: React.FC = () => {
     });
   };
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-    >
-      <Form.Item
-        name="url"
-        label="URL"
-        rules={[{ required: true }, { type: 'url', warningOnly: true }, { type: 'string', min: 6 }]}
+    <>
+      {contextHolder}
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
       >
-        <Input placeholder="input placeholder" />
-      </Form.Item>
-      <Form.Item>
-        <Space>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-          <Button htmlType="button" onClick={onFill}>
-            Fill
-          </Button>
-        </Space>
-      </Form.Item>
-    </Form>
+        <Form.Item
+          name="url"
+          label="URL"
+          rules={[
+            { required: true },
+            { type: 'url', warningOnly: true },
+            { type: 'string', min: 6 },
+          ]}
+        >
+          <Input placeholder="input placeholder" />
+        </Form.Item>
+        <Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+            <Button htmlType="button" onClick={onFill}>
+              Fill
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </>
   );
 };
 export default App;
@@ -976,7 +984,7 @@ const App: React.FC = () => {
             {fields.map((field, index) => (
               <Form.Item
                 {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-                label={index === 0 ? 'Passengers' : ''}
+                label={index === 0 ? 'Passengers' : undefined}
                 required={false}
                 key={field.key}
               >
@@ -1090,6 +1098,144 @@ const App: React.FC = () => (
     </Form.Item>
   </Form>
 );
+export default App;
+```
+### 拖拽排序
+结合 [dnd-kit](https://github.com/clauderic/dnd-kit) 与 `Form.List` 提供的 `move` 操作，实现动态表单项的拖拽排序。拖拽以每个字段稳定的 `key` 作为标识，结束拖拽时调用 `move(from, to)` 调整顺序，表单数据会随之同步。
+
+```tsx
+import React, { useContext, useMemo } from 'react';
+import { HolderOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import type { DragEndEvent, DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core';
+import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Button, Form, Input, Space } from 'antd';
+const onFinish = (values: any) => {
+  console.log('Received values of form:', values);
+};
+interface RowContextProps {
+  setActivatorNodeRef?: (element: HTMLElement | null) => void;
+  listeners?: DraggableSyntheticListeners;
+  attributes?: DraggableAttributes;
+}
+const RowContext = React.createContext<RowContextProps>({});
+const DragHandle: React.FC = () => {
+  const { setActivatorNodeRef, listeners, attributes } = useContext(RowContext);
+  return (
+    <Button
+      type="text"
+      size="small"
+      icon={<HolderOutlined />}
+      style={{ cursor: 'move' }}
+      ref={setActivatorNodeRef}
+      {...attributes}
+      {...listeners}
+    />
+  );
+};
+interface SortableItemProps {
+  id: number;
+  children?: React.ReactNode;
+}
+const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
+  const {
+    setNodeRef,
+    setActivatorNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+  const style: React.CSSProperties = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
+  };
+  const contextValue = useMemo<RowContextProps>(
+    () => ({ setActivatorNodeRef, listeners, attributes }),
+    [setActivatorNodeRef, listeners, attributes],
+  );
+  return (
+    <RowContext.Provider value={contextValue}>
+      <div ref={setNodeRef} style={style}>
+        {children}
+      </div>
+    </RowContext.Provider>
+  );
+};
+const App: React.FC = () => {
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 1 } }));
+  return (
+    <Form
+      name="dynamic_form_draggable_item"
+      onFinish={onFinish}
+      style={{ maxWidth: 600 }}
+      autoComplete="off"
+    >
+      <Form.List name="users">
+        {(fields, { add, remove, move }) => {
+          const onDragEnd = ({ active, over }: DragEndEvent) => {
+            if (over && active.id !== over.id) {
+              const activeIndex = fields.findIndex((field) => field.key === active.id);
+              const overIndex = fields.findIndex((field) => field.key === over.id);
+              if (activeIndex !== -1 && overIndex !== -1) {
+                move(activeIndex, overIndex);
+              }
+            }
+          };
+          return (
+            <DndContext
+              sensors={sensors}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={onDragEnd}
+            >
+              <SortableContext
+                items={fields.map((field) => field.key)}
+                strategy={verticalListSortingStrategy}
+              >
+                {fields.map(({ key, name, ...restField }) => (
+                  <SortableItem key={key} id={key}>
+                    <Space style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                      <DragHandle />
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'first']}
+                        rules={[{ required: true, message: 'Missing first name' }]}
+                      >
+                        <Input placeholder="First Name" />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'last']}
+                        rules={[{ required: true, message: 'Missing last name' }]}
+                      >
+                        <Input placeholder="Last Name" />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    </Space>
+                  </SortableItem>
+                ))}
+                <Form.Item>
+                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    Add field
+                  </Button>
+                </Form.Item>
+              </SortableContext>
+            </DndContext>
+          );
+        }}
+      </Form.List>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
 export default App;
 ```
 ### 动态增减嵌套纯字段
@@ -1477,6 +1623,7 @@ export default App;
 ```
 ### 表单数据存储于上层组件
 通过 `onFieldsChange` 和 `fields`，可以把表单的数据存储到上层组件或者 [Redux](https://github.com/reactjs/redux)、[dva](https://github.com/dvajs/dva) 中，更多可参考 [rc-field-form 示例](https://rc-field-form.react-component.now.sh/?selectedKind=rc-field-form&selectedStory=StateForm-redux&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)。
+`onFieldsChange` 返回扁平的 `FieldData[]`。当字段名为数组路径时，`FieldData.name` 会保留该路径，而不是转换为嵌套对象，便于在外部状态中逐项处理字段。
 **注意：** 将表单数据存储于外部容器[并非好的实践](https://github.com/reduxjs/redux/issues/1287#issuecomment-175351978)，如无必要请避免使用。
 
 ```tsx
@@ -1485,7 +1632,7 @@ import { Form, Input, Typography } from 'antd';
 const { Paragraph } = Typography;
 interface FieldData {
   name: string | number | (string | number)[];
-  value?: any;
+  value?: unknown;
   touched?: boolean;
   validating?: boolean;
   errors?: string[];
@@ -1510,10 +1657,16 @@ const CustomizedForm: React.FC<CustomizedFormProps> = ({ onChange, fields }) => 
     >
       <Input />
     </Form.Item>
+    <Form.Item name={['profile', 'email']} label="Email">
+      <Input />
+    </Form.Item>
   </Form>
 );
 const App: React.FC = () => {
-  const [fields, setFields] = useState<FieldData[]>([{ name: ['username'], value: 'Ant Design' }]);
+  const [fields, setFields] = useState<FieldData[]>([
+    { name: ['username'], value: 'Ant Design' },
+    { name: ['profile', 'email'], value: 'antd@example.com' },
+  ]);
   return (
     <>
       <CustomizedForm
@@ -1693,7 +1846,7 @@ const App: React.FC = () => {
             disabled={
               !clientReady ||
               !form.isFieldsTouched(true) ||
-              !!form.getFieldsError().filter(({ errors }) => errors.length).length
+              form.getFieldsError().some(({ errors }) => errors.length)
             }
           >
             Log in
@@ -2963,7 +3116,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Button, Form, Input, Space } from 'antd';
-import type { FormProps } from 'antd';
+import type { FormProps, GetProp } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
@@ -2985,7 +3138,7 @@ const stylesObject: FormProps['styles'] = {
     paddingInlineStart: 12,
   },
 };
-const stylesFunction: FormProps['styles'] = (info) => {
+const stylesFunction: FormProps['styles'] = (info): GetProp<FormProps, 'styles', 'Return'> => {
   if (info.props.variant === 'filled') {
     return {
       root: {
@@ -2998,7 +3151,7 @@ const stylesFunction: FormProps['styles'] = (info) => {
       content: {
         paddingInlineStart: 12,
       },
-    } satisfies FormProps['styles'];
+    };
   }
   return {};
 };
@@ -3128,13 +3281,13 @@ const App: React.FC = () => (
       <Input placeholder="unavailable choice" disabled addonBefore="Buggy!" />
     </Form.Item>
     <Form.Item label="Normal3">
-      <Input placeholder="unavailable choice" prefix="人民币" value="50" />
+      <Input placeholder="unavailable choice" prefix="RMB" value="50" />
     </Form.Item>
     <Form.Item label="Fail3" validateStatus="error" help="Buggy!">
-      <Input placeholder="unavailable choice" prefix="人民币" value="50" />
+      <Input placeholder="unavailable choice" prefix="RMB" value="50" />
     </Form.Item>
     <Form.Item label="FailDisabled3" validateStatus="error" help="Buggy!">
-      <Input placeholder="unavailable choice" disabled prefix="人民币" value="50" />
+      <Input placeholder="unavailable choice" disabled prefix="RMB" value="50" />
     </Form.Item>
   </Form>
 );
@@ -3189,7 +3342,7 @@ const sharedItem = (
       <a
         href="https://github.com/ant-design/ant-design/issues/36459"
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
       >
         #36459
       </a>

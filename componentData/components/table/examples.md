@@ -2208,6 +2208,143 @@ const App: React.FC = () => {
 };
 export default App;
 ```
+### 自动高度
+通过封装，实现 Table 始终自动填充容器高度。
+
+```tsx
+import React, { useEffect, useRef, useState } from 'react';
+import { Flex, Switch, Table } from 'antd';
+import type { GetRef, TableColumnsType, TableProps } from 'antd';
+// ===================== HOC =====================
+const measureClassNames = {
+  header: 'measure-header',
+  pagination: 'measure-pagination',
+};
+const tableClassNames = {
+  header: {
+    wrapper: measureClassNames.header,
+  },
+  pagination: {
+    root: measureClassNames.pagination,
+  },
+};
+type AutoHeightTableProps<RecordType extends object> = Omit<
+  TableProps<RecordType>,
+  'styles' | 'classNames'
+>;
+const AutoHeightTable = <RecordType extends object>(props: AutoHeightTableProps<RecordType>) => {
+  const { scroll, style, ...restProps } = props;
+  const rootRef = useRef<GetRef<typeof Table>>(null);
+  const [scrollY, setScrollY] = useState(0);
+  const [sectionHeight, setSectionHeight] = useState(0);
+  const getHeight = (className: string | HTMLElement) => {
+    const ele =
+      typeof className === 'string'
+        ? rootRef.current?.nativeElement?.querySelector<HTMLElement>(`.${className}`)
+        : className;
+    if (ele) {
+      const styles = getComputedStyle(ele);
+      const marginTop = Number.parseFloat(styles.marginTop) || 0;
+      const marginBottom = Number.parseFloat(styles.marginBottom) || 0;
+      return ele.getBoundingClientRect().height + marginTop + marginBottom;
+    }
+    return 0;
+  };
+  useEffect(() => {
+    const element = rootRef.current?.nativeElement;
+    if (!element) {
+      return;
+    }
+    const measure = () => {
+      const totalHeight = getHeight(element);
+      const headerHeight = getHeight(measureClassNames.header);
+      const paginationHeight = getHeight(measureClassNames.pagination);
+      setScrollY(Math.max(0, Math.floor(totalHeight - headerHeight - paginationHeight)));
+      setSectionHeight(totalHeight - paginationHeight);
+    };
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(element);
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+  return (
+    <Table<RecordType>
+      {...restProps}
+      ref={rootRef}
+      scroll={{ ...scroll, y: scrollY }}
+      style={{ ...style, height: '100%' }}
+      styles={{
+        section: {
+          height: sectionHeight,
+        },
+      }}
+      classNames={tableClassNames}
+    />
+  );
+};
+// ==================== Usage ====================
+interface DataType {
+  key: React.Key;
+  name: string;
+  age: number;
+  address: string;
+}
+const columns: TableColumnsType<DataType> = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    width: '20%',
+  },
+  {
+    title: 'Age',
+    dataIndex: 'age',
+    width: '20%',
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address',
+    width: '60%',
+  },
+];
+const genData = (length: number): DataType[] => {
+  return Array.from({ length }).map<DataType>((_, index) => ({
+    key: index,
+    name: `Edward King ${index}`,
+    age: 32 + index,
+    address: `London, Park Lane no. ${index}`,
+  }));
+};
+const dataMore = genData(30);
+const dataLess = genData(2);
+const App: React.FC = () => {
+  const [hasData, setHasData] = useState(true);
+  const mergedData = hasData ? dataMore : dataLess;
+  return (
+    <Flex vertical gap="middle" align="start">
+      <Switch
+        checked={hasData}
+        checkedChildren="More Data"
+        unCheckedChildren="More Data"
+        onChange={setHasData}
+      />
+      <div
+        style={{
+          height: 400,
+          boxSizing: 'border-box',
+          background: 'rgba(140, 140, 140, 0.03)',
+          padding: 16,
+          alignSelf: 'stretch',
+        }}
+      >
+        <AutoHeightTable<DataType> columns={columns} dataSource={mergedData} />
+      </div>
+    </Flex>
+  );
+};
+export default App;
+```
 ### 固定列
 对于列数很多的数据，可以固定前后的列，横向滚动查看其它数据，需要和 `scroll.x` 配合使用。
 > 若列头与内容不对齐或出现列重复，请指定**固定列**的宽度 `width`。如果指定 `width` 不生效或出现白色垂直空隙，请尝试建议留一列不设宽度以适应弹性布局，或者检查是否有[超长连续字段破坏布局](https://github.com/ant-design/ant-design/issues/13825#issuecomment-449889241)。
@@ -3369,13 +3506,16 @@ interface DragIndexState {
 }
 const DragIndexContext = createContext<DragIndexState>({ active: -1, over: -1 });
 const dragActiveStyle = (dragState: DragIndexState, id: string) => {
-  const { active, over } = dragState;
+  const { active, over, direction } = dragState;
   // drag active style
   let style: React.CSSProperties = {};
   if (active && active === id) {
     style = { backgroundColor: 'gray', opacity: 0.5 };
   } else if (over && id === over && active !== over) {
-    style = { borderInlineStart: '1px dashed gray' };
+    style =
+      direction === 'right'
+        ? { borderInlineEnd: '1px dashed gray' }
+        : { borderInlineStart: '1px dashed gray' };
   }
   return style;
 };
@@ -3689,6 +3829,61 @@ const data = [
   },
 ];
 const App: React.FC = () => <Table<DataType> columns={columns} dataSource={data} />;
+export default App;
+```
+### 统一列配置
+通过 `column` 在 Table 上统一设置列属性，并按需在单列上覆盖。
+
+```tsx
+import React from 'react';
+import type { TableProps } from 'antd';
+import { Table } from 'antd';
+interface DataType {
+  key: React.Key;
+  name: string;
+  address: string;
+  description: string;
+}
+const columns: TableProps<DataType>['columns'] = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    width: 140,
+  },
+  {
+    title: 'Description',
+    dataIndex: 'description',
+    width: 180,
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address',
+    align: 'left',
+    width: 220,
+  },
+];
+const data: DataType[] = [
+  {
+    key: '1',
+    name: 'John Brown',
+    description: 'Shared column props let repeated column settings live on the table.',
+    address: 'No. 1 Lake Park Road, Hangzhou, Zhejiang, China',
+  },
+  {
+    key: '2',
+    name: 'Jim Green',
+    description: 'Columns can still override the default alignment or other shared props.',
+    address: 'No. 99 Garden Avenue, Pudong, Shanghai, China',
+  },
+];
+const App: React.FC = () => (
+  <Table<DataType>
+    columns={columns}
+    dataSource={data}
+    column={{ align: 'center', ellipsis: true }}
+    pagination={false}
+  />
+);
 export default App;
 ```
 ### 自定义单元格省略提示
@@ -4904,7 +5099,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Table } from 'antd';
-import type { TableProps } from 'antd';
+import type { GetProp, TableProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -4966,8 +5161,18 @@ const styles: TableProps<DataType>['styles'] = {
       padding: 10,
     },
   },
+  body: {
+    row: {
+      outline: '1px dashed rgba(226, 225, 225, 0.1)',
+    },
+    cell: {
+      outline: '1px dashed rgba(226, 225, 225, 0.1)',
+    },
+  },
 };
-const stylesFn: TableProps<DataType>['styles'] = (info) => {
+const stylesFn: TableProps<DataType>['styles'] = (
+  info,
+): GetProp<TableProps<DataType>, 'styles', 'Return'> => {
   if (info?.props?.size === 'medium') {
     return {
       root: {
@@ -5002,7 +5207,7 @@ const stylesFn: TableProps<DataType>['styles'] = (info) => {
           color: '#b8bdfd',
         },
       },
-    } satisfies TableProps<DataType>['styles'];
+    };
   }
   return {};
 };
@@ -5021,6 +5226,8 @@ const App: React.FC = () => {
         title={() => 'Table Object Styles'}
         footer={() => 'Table Object Footer'}
         size="small"
+        virtual
+        scroll={{ y: 300 }}
       />
       <Table<DataType>
         {...sharedProps}
