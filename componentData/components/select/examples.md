@@ -438,74 +438,6 @@ const App: React.FC = () => {
 };
 export default App;
 ```
-### 搜索框
-搜索和远程数据结合。
-
-```tsx
-import React, { useState } from 'react';
-import { Select } from 'antd';
-import type { SelectProps } from 'antd';
-let timeout: ReturnType<typeof setTimeout> | null;
-let currentValue: string;
-const toURLSearchParams = <T extends Record<string, any>>(record: T) => {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(record)) {
-    params.append(key, value);
-  }
-  return params;
-};
-const fetchData = (value: string, callback: (data: { value: string; text: string }[]) => void) => {
-  if (timeout) {
-    clearTimeout(timeout);
-    timeout = null;
-  }
-  currentValue = value;
-  const params = toURLSearchParams({ code: 'utf-8', q: value });
-  const fake = () => {
-    fetch(`https://suggest.taobao.com/sug?${params.toString()}`)
-      .then((response) => response.json())
-      .then(({ result }) => {
-        if (currentValue === value) {
-          const data = result.map((item: any) => ({ value: item[0], text: item[0] }));
-          callback(data);
-        }
-      });
-  };
-  if (value) {
-    timeout = setTimeout(fake, 300);
-  } else {
-    callback([]);
-  }
-};
-const SearchInput: React.FC<{ placeholder: string; style: React.CSSProperties }> = (props) => {
-  const [data, setData] = useState<SelectProps['options']>([]);
-  const [value, setValue] = useState<string>();
-  const handleSearch = (newValue: string) => {
-    fetchData(newValue, setData);
-  };
-  const handleChange = (newValue: string) => {
-    setValue(newValue);
-  };
-  return (
-    <Select
-      showSearch={{ filterOption: false, onSearch: handleSearch }}
-      value={value}
-      placeholder={props.placeholder}
-      style={props.style}
-      defaultActiveFirstOption={false}
-      suffixIcon={null}
-      onChange={handleChange}
-      notFoundContent={null}
-      options={(data || []).map((d) => ({
-        value: d.value,
-        label: d.text,
-      }))}
-    />
-  );
-};
-const App: React.FC = () => <SearchInput placeholder="input search text" style={{ width: 200 }} />;
-export default App;
-```
 ### 获得选项的文本
 默认情况下 `onChange` 里只能拿到 `value`，如果需要拿到选中的节点文本 `label`，可以使用 `labelInValue` 属性。
 选中项的 `label` 会被包装到 `value` 中传递给 `onChange` 等函数，此时 `value` 是一个对象。
@@ -564,6 +496,32 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 自定义分词
+自定义分词函数，按业务规则拆分输入内容。
+
+```tsx
+import React from 'react';
+import { Select } from 'antd';
+const tokenize = (input: string): string[] => {
+  const tokens: string[] = [];
+  const regex = /"([^"]*)"|([^,\n]+)/g;
+  let match: RegExpExecArray | null = regex.exec(input);
+  while (match) {
+    tokens.push((match[1] ?? match[2]).trim());
+    match = regex.exec(input);
+  }
+  return tokens.filter(Boolean);
+};
+const App: React.FC = () => (
+  <Select
+    mode="tags"
+    style={{ width: '100%' }}
+    tokenSeparators={tokenize}
+    placeholder='Try paste: "San Francisco, CA", New York'
+  />
+);
+export default App;
+```
 ### 搜索用户
 一个带有远程搜索，防抖控制，请求时序控制，加载状态的多选示例。
 
@@ -608,7 +566,11 @@ function DebounceSelect<
   return (
     <Select
       labelInValue
-      showSearch={{ filterOption: false, onSearch: debounceFetcher }}
+      showSearch={{
+        autoClearSearchValue: false,
+        filterOption: false,
+        onSearch: debounceFetcher,
+      }}
       notFoundContent={fetching ? <Spin size="small" /> : 'No results found'}
       {...props}
       options={options}
@@ -1709,7 +1671,7 @@ export default App;
 import React from 'react';
 import { MehOutlined } from '@ant-design/icons';
 import { Flex, Select } from 'antd';
-import type { SelectProps } from 'antd';
+import type { GetProp, SelectProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -1729,8 +1691,7 @@ const stylesObject: SelectProps['styles'] = {
     color: '#1890ff',
   },
 };
-const stylesFn: SelectProps['styles'] = (info) => {
-  const { props } = info;
+const stylesFn: SelectProps['styles'] = ({ props }): GetProp<SelectProps, 'styles', 'Return'> => {
   if (props.variant === 'filled') {
     return {
       prefix: {
@@ -1744,7 +1705,7 @@ const stylesFn: SelectProps['styles'] = (info) => {
           border: '1px solid #722ed1',
         },
       },
-    } satisfies SelectProps['styles'];
+    };
   }
   return {};
 };

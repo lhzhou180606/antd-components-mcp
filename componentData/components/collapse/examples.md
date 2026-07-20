@@ -376,47 +376,59 @@ export default App;
 ```tsx
 import React from 'react';
 import { Collapse, Space } from 'antd';
+import { createStyles } from 'antd-style';
 const text = `
   A dog is a type of domesticated animal.
   Known for its loyalty and faithfulness,
   it can be found as a welcome guest in many households across the world.
 `;
-const App: React.FC = () => (
-  <Space vertical>
-    <Collapse
-      collapsible="header"
-      defaultActiveKey={['1']}
-      items={[
-        {
-          key: '1',
-          label: 'This panel can be collapsed by clicking text or icon',
-          children: <p>{text}</p>,
-        },
-      ]}
-    />
-    <Collapse
-      collapsible="icon"
-      defaultActiveKey={['1']}
-      items={[
-        {
-          key: '1',
-          label: 'This panel can only be collapsed by clicking icon',
-          children: <p>{text}</p>,
-        },
-      ]}
-    />
-    <Collapse
-      collapsible="disabled"
-      items={[
-        {
-          key: '1',
-          label: "This panel can't be collapsed",
-          children: <p>{text}</p>,
-        },
-      ]}
-    />
-  </Space>
-);
+const useStyles = createStyles((props) => {
+  const { css } = props;
+  return {
+    content: css`
+      width: 100%;
+    `,
+  };
+});
+const App: React.FC = () => {
+  const { styles } = useStyles();
+  return (
+    <Space className={styles.content} vertical>
+      <Collapse
+        collapsible="header"
+        defaultActiveKey={['1']}
+        items={[
+          {
+            key: '1',
+            label: 'This panel can be collapsed by clicking text or icon',
+            children: <p>{text}</p>,
+          },
+        ]}
+      />
+      <Collapse
+        collapsible="icon"
+        defaultActiveKey={['1']}
+        items={[
+          {
+            key: '1',
+            label: 'This panel can only be collapsed by clicking icon',
+            children: <p>{text}</p>,
+          },
+        ]}
+      />
+      <Collapse
+        collapsible="disabled"
+        items={[
+          {
+            key: '1',
+            label: "This panel can't be collapsed",
+            children: <p>{text}</p>,
+          },
+        ]}
+      />
+    </Space>
+  );
+};
 export default App;
 ```
 ### 自定义语义结构的样式和类
@@ -424,9 +436,9 @@ export default App;
 
 ```tsx
 import React from 'react';
+import type { CollapseProps, GetProp } from 'antd';
 import { Collapse, Flex } from 'antd';
 import { createStaticStyles } from 'antd-style';
-import type { CollapseProps } from '..';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
     background-color: #fafafa;
@@ -469,7 +481,9 @@ const styles: CollapseProps['styles'] = {
     color: '#141414',
   },
 };
-const stylesFn: CollapseProps['styles'] = ({ props }) => {
+const stylesFn: CollapseProps['styles'] = ({
+  props,
+}): GetProp<CollapseProps, 'styles', 'Return'> => {
   if (props.size === 'large') {
     return {
       root: {
@@ -482,7 +496,7 @@ const stylesFn: CollapseProps['styles'] = ({ props }) => {
         padding: '12px 16px',
         color: '#141414',
       },
-    } satisfies CollapseProps['styles'];
+    };
   }
 };
 const App: React.FC = () => {
