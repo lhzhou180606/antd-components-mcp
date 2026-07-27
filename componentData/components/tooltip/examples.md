@@ -245,10 +245,10 @@ const Block = React.forwardRef<HTMLDivElement, Partial<TooltipProps>>((props, re
       }}
     >
       <Tooltip {...props} placement="left" title="Prompt Text">
-        <Button>Adjust automatically / 自动调整</Button>
+        <Button>Adjust automatically</Button>
       </Tooltip>
       <Tooltip {...props} placement="left" title="Prompt Text" autoAdjustOverflow={false}>
-        <Button>Ignore / 不处理</Button>
+        <Button>Ignore</Button>
       </Tooltip>
     </div>
   </div>
@@ -444,7 +444,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Button, Flex, Tooltip } from 'antd';
-import type { TooltipProps } from 'antd';
+import type { GetProp, TooltipProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   container: css`
@@ -457,7 +457,7 @@ const styles: TooltipProps['styles'] = {
     boxShadow: 'inset 0 0 8px #ccc',
   },
 };
-const stylesFn: TooltipProps['styles'] = (info) => {
+const stylesFn: TooltipProps['styles'] = (info): GetProp<TooltipProps, 'styles', 'Return'> => {
   if (!info.props.arrow) {
     return {
       container: {
@@ -466,7 +466,7 @@ const stylesFn: TooltipProps['styles'] = (info) => {
         color: '#fff',
         borderRadius: 4,
       },
-    } satisfies TooltipProps['styles'];
+    };
   }
   return {};
 };

@@ -18,6 +18,7 @@ const App: React.FC = () => (
         href="https://github.com/ant-design/ant-design/issues/1862"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="Ant Design issue"
       >
         Link
       </a>
@@ -263,14 +264,14 @@ const App: React.FC = () => {
 export default App;
 ```
 ### 添加动画
-使用 [rc-tween-one](https://github.com/react-component/tween-one) 给标签增加添加或删除动画。
+使用 [motion](https://motion.dev/) 给标签增加添加或删除动画。
 
 ```tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import type { InputRef } from 'antd';
 import { Input, Tag, theme } from 'antd';
-import { TweenOneGroup } from 'rc-tween-one';
+import { AnimatePresence, motion } from 'motion/react';
 const tagGroupStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -278,6 +279,12 @@ const tagGroupStyle: React.CSSProperties = {
   gap: 8,
   marginBottom: 8,
 };
+const tagMotionVariants = {
+  initial: { scale: 0.8, opacity: 0 },
+  animate: { scale: 1, opacity: 1, transition: { duration: 0.1 } },
+  exit: { opacity: 0, width: 0, scale: 0, transition: { duration: 0.2 } },
+};
+const MotionTag = motion.create(Tag);
 const App: React.FC = () => {
   const { token } = theme.useToken();
   const [tags, setTags] = useState(['Tag 1', 'Tag 2', 'Tag 3']);
@@ -313,30 +320,28 @@ const App: React.FC = () => {
   };
   return (
     <>
-      <TweenOneGroup
-        appear={false}
-        style={tagGroupStyle}
-        enter={{ scale: 0.8, opacity: 0, type: 'from', duration: 100 }}
-        leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
-        onEnd={(e) => {
-          if (e.type === 'appear' || e.type === 'enter') {
-            (e.target as any).style = 'display: inline-block';
-          }
-        }}
-      >
-        {tags.map((tag) => (
-          <Tag
-            key={tag}
-            closable
-            onClose={(e) => {
-              e.preventDefault();
-              handleClose(tag);
-            }}
-          >
-            {tag}
-          </Tag>
-        ))}
-      </TweenOneGroup>
+      <div style={tagGroupStyle}>
+        <AnimatePresence initial={false}>
+          {tags.map((tag) => (
+            <MotionTag
+              key={tag}
+              closable
+              layout
+              variants={tagMotionVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              style={{ display: 'inline-block', overflow: 'hidden', whiteSpace: 'nowrap' }}
+              onClose={(e: React.MouseEvent<HTMLElement>) => {
+                e.preventDefault();
+                handleClose(tag);
+              }}
+            >
+              {tag}
+            </MotionTag>
+          ))}
+        </AnimatePresence>
+      </div>
       {inputVisible ? (
         <Input
           ref={inputRef}
@@ -361,6 +366,7 @@ export default App;
 ### 图标按钮
 你可以通过 `icon` 属性为标签添加自定义图标。注意，CheckableTag 的 `icon` 属性在 `>=5.27.0` 版本支持。
 若需要控制图标的位置，请在 `children` 中直接使用 `<XXXIcon />` 组件，而非通过 `icon` 属性实现。
+`icon` 也支持第三方图标库的裸 `<svg>` 元素，无论其尺寸以 `em` 还是 `px` 设置，都会自动与文字居中对齐。
 
 ```tsx
 import React from 'react';
@@ -371,6 +377,18 @@ import {
   YoutubeOutlined,
 } from '@ant-design/icons';
 import { Divider, Flex, Tag } from 'antd';
+// Icons from third-party libraries render as a bare `<svg>` rather than an `.anticon` wrapper.
+// They stay centred whether sized in `em` (StarIcon) or in `px` (HeartIcon, like lucide's default).
+const StarIcon: React.FC = () => (
+  <svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+    <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z" />
+  </svg>
+);
+const HeartIcon: React.FC = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+    <path d="M12 20.7l-1.4-1.3C5.4 14.8 2 11.7 2 8a5 5 0 0 1 10-1.7A5 5 0 0 1 22 8c0 3.7-3.4 6.8-8.6 11.4L12 20.7z" />
+  </svg>
+);
 const App: React.FC = () => {
   const [checked, setChecked] = React.useState<Array<boolean>>([true, false, false, false]);
   const handleChange = (index: number, value: boolean) => {
@@ -426,6 +444,18 @@ const App: React.FC = () => {
           LinkedIn
         </Tag.CheckableTag>
       </Flex>
+      <Divider titlePlacement="start">Tag with third-party icon</Divider>
+      <Flex gap="small" wrap align="center">
+        <Tag icon={<StarIcon />} color="#f50">
+          Star (em)
+        </Tag>
+        <Tag icon={<HeartIcon />} color="#eb2f96">
+          Heart (px)
+        </Tag>
+        <Tag icon={<HeartIcon />} closable>
+          Closable
+        </Tag>
+      </Flex>
     </>
   );
 };
@@ -479,7 +509,7 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { Flex, Tag } from 'antd';
 const App: React.FC = () => (
   <Flex gap="small" align="center" wrap>
-    <Tag closable closeIcon="关 闭">
+    <Tag closable closeIcon="Close">
       Tag1
     </Tag>
     <Tag closable closeIcon={<CloseCircleOutlined />}>
@@ -585,7 +615,8 @@ const App: React.FC = () => (
           <a
             href="https://github.com/ant-design/ant-design/issues/1862"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
+            aria-label="Ant Design issue"
           >
             Link
           </a>
@@ -594,7 +625,8 @@ const App: React.FC = () => (
           <a
             href="https://github.com/ant-design/ant-design/issues/1862"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
+            aria-label="Ant Design issue"
           >
             Link
           </a>
@@ -619,20 +651,8 @@ const App: React.FC = () => (
         </Tag>
       </Flex>
     </ConfigProvider>
-    <ConfigProvider
-      theme={{
-        algorithm: theme.darkAlgorithm,
-      }}
-    >
-      <Flex
-        gap="small"
-        align="center"
-        wrap
-        style={{
-          background: '#000',
-          padding: 4,
-        }}
-      >
+    <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+      <Flex gap="small" align="center" wrap style={{ backgroundColor: '#000', padding: 4 }}>
         <Tag variant="solid" color="default">
           Dark
         </Tag>
@@ -651,90 +671,99 @@ import { Flex, message, Tag } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 const { CheckableTag } = Tag;
 const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [selectedTags, setSelectedTags] = useState<string[]>(['Books']);
   const handleClose = (tagName: string) => {
     console.log(`Tag ${tagName} closed`);
-    message.info(`Tag ${tagName} closed`);
+    messageApi.info(`Tag ${tagName} closed`);
   };
   const handleCheckableChange = (tag: string, checked: boolean) => {
     const nextSelectedTags = checked
       ? [...selectedTags, tag]
       : selectedTags.filter((t) => t !== tag);
     setSelectedTags(nextSelectedTags);
-    message.info(`${tag} is ${checked ? 'checked' : 'unchecked'}`);
+    messageApi.info(`${tag} is ${checked ? 'checked' : 'unchecked'}`);
   };
   return (
-    <Flex vertical gap="medium">
-      <Flex gap="small" wrap>
-        <Tag disabled>Basic Tag</Tag>
-        <Tag disabled>
-          <a href="https://ant.design">Link Tag</a>
-        </Tag>
-        <Tag disabled href="https://ant.design">
-          Href Tag
-        </Tag>
-        <Tag disabled color="success" icon={<CheckCircleOutlined />}>
-          Icon Tag
-        </Tag>
-      </Flex>
-      <Flex gap="small" wrap>
-        <Tag disabled color="red">
-          Preset Color Red
-        </Tag>
-        <Tag disabled color="#f50">
-          Custom Color #f50 Outlined
-        </Tag>
-        <Tag disabled color="#f50" variant="solid">
-          Custom Color #f50 Filled
-        </Tag>
-        <Tag disabled color="#f50" variant="filled">
-          Custom Color #f50 Borderless
-        </Tag>
-        <Tag disabled color="success">
-          Preset Status Success
-        </Tag>
-      </Flex>
-      <Flex gap="small" wrap>
-        {['Books', 'Movies', 'Music'].map((tag) => (
-          <CheckableTag
-            key={tag}
+    <>
+      {contextHolder}
+      <Flex vertical gap="medium">
+        <Flex gap="small" wrap>
+          <Tag disabled>Basic Tag</Tag>
+          <Tag disabled>
+            <a href="https://ant.design">Link Tag</a>
+          </Tag>
+          <Tag disabled href="https://ant.design">
+            Href Tag
+          </Tag>
+          <Tag disabled color="success" icon={<CheckCircleOutlined />}>
+            Icon Tag
+          </Tag>
+        </Flex>
+        <Flex gap="small" wrap>
+          <Tag disabled color="red">
+            Preset Color Red
+          </Tag>
+          <Tag disabled color="#f50">
+            Custom Color #f50 Outlined
+          </Tag>
+          <Tag disabled color="#f50" variant="solid">
+            Custom Color #f50 Filled
+          </Tag>
+          <Tag disabled color="#f50" variant="filled">
+            Custom Color #f50 Borderless
+          </Tag>
+          <Tag disabled color="success">
+            Preset Status Success
+          </Tag>
+        </Flex>
+        <Flex gap="small" wrap>
+          {['Books', 'Movies', 'Music'].map((tag) => (
+            <CheckableTag
+              key={tag}
+              disabled
+              checked={selectedTags.includes(tag)}
+              onChange={(checked) => handleCheckableChange(tag, checked)}
+            >
+              {tag}
+            </CheckableTag>
+          ))}
+        </Flex>
+        <Flex gap="small" wrap>
+          <Tag disabled closable onClose={() => handleClose('Closable')}>
+            Closable Tag
+          </Tag>
+          <Tag
             disabled
-            checked={selectedTags.includes(tag)}
-            onChange={(checked) => handleCheckableChange(tag, checked)}
+            closable
+            color="success"
+            icon={<CheckCircleOutlined />}
+            onClose={() => handleClose('Closable Success')}
           >
-            {tag}
-          </CheckableTag>
-        ))}
+            Closable with Icon
+          </Tag>
+          <Tag disabled closable closeIcon={<CloseCircleOutlined />}>
+            Closable with Custom Icon
+          </Tag>
+        </Flex>
+        <Flex gap="small" wrap>
+          <Tag disabled variant="filled">
+            Borderless Basic
+          </Tag>
+          <Tag disabled variant="filled" color="success" icon={<CheckCircleOutlined />}>
+            Borderless with Icon
+          </Tag>
+          <Tag
+            disabled
+            variant="filled"
+            closable
+            onClose={() => handleClose('Borderless Closable')}
+          >
+            Borderless Closable
+          </Tag>
+        </Flex>
       </Flex>
-      <Flex gap="small" wrap>
-        <Tag disabled closable onClose={() => handleClose('Closable')}>
-          Closable Tag
-        </Tag>
-        <Tag
-          disabled
-          closable
-          color="success"
-          icon={<CheckCircleOutlined />}
-          onClose={() => handleClose('Closable Success')}
-        >
-          Closable with Icon
-        </Tag>
-        <Tag disabled closable closeIcon={<CloseCircleOutlined />}>
-          Closable with Custom Icon
-        </Tag>
-      </Flex>
-      <Flex gap="small" wrap>
-        <Tag disabled variant="filled">
-          Borderless Basic
-        </Tag>
-        <Tag disabled variant="filled" color="success" icon={<CheckCircleOutlined />}>
-          Borderless with Icon
-        </Tag>
-        <Tag disabled variant="filled" closable onClose={() => handleClose('Borderless Closable')}>
-          Borderless Closable
-        </Tag>
-      </Flex>
-    </Flex>
+    </>
   );
 };
 export default App;
@@ -746,7 +775,7 @@ export default App;
 import React from 'react';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Flex, Space, Tag } from 'antd';
-import type { GetProps, TagProps } from 'antd';
+import type { GetProp, GetProps, TagProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 type CheckableTagGroupProps = GetProps<typeof Tag.CheckableTagGroup>;
 const classNames = createStaticStyles(({ css }) => ({
@@ -766,7 +795,7 @@ const styles: TagProps['styles'] = {
     color: '#262626',
   },
 };
-const stylesFn: TagProps['styles'] = (info) => {
+const stylesFn: TagProps['styles'] = (info): GetProp<TagProps, 'styles', 'Return'> => {
   if (info.props.variant === 'filled') {
     return {
       root: {
@@ -778,7 +807,7 @@ const stylesFn: TagProps['styles'] = (info) => {
       content: {
         color: '#8F87F1',
       },
-    } satisfies TagProps['styles'];
+    };
   }
 };
 const groupStyles: CheckableTagGroupProps['styles'] = {
@@ -794,7 +823,9 @@ const groupStyles: CheckableTagGroupProps['styles'] = {
     color: '#52c41a',
   },
 };
-const groupStylesFn: CheckableTagGroupProps['styles'] = (info) => {
+const groupStylesFn: CheckableTagGroupProps['styles'] = (
+  info,
+): GetProp<CheckableTagGroupProps, 'styles', 'Return'> => {
   const { multiple } = info.props;
   if (multiple) {
     return {
@@ -810,7 +841,7 @@ const groupStylesFn: CheckableTagGroupProps['styles'] = (info) => {
         color: '#8F87F1',
         fontWeight: 500,
       },
-    } satisfies CheckableTagGroupProps['styles'];
+    };
   }
   return {};
 };

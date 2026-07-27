@@ -528,7 +528,6 @@ import difference from 'lodash/difference';
 dayjs.extend(customParseFormat);
 const { Panel } = Collapse;
 const { TreeNode } = Tree;
-const { TabPane } = Tabs;
 const { Meta } = Card;
 const { Link } = Anchor;
 const { Text } = Typography;
@@ -893,17 +892,14 @@ const Demo: React.FC = () => {
             <Link href="#Link-Props" title="Link Props" />
           </Link>
         </Anchor>
-        <Tabs type="card">
-          <TabPane tab="Tab 1" key="1">
-            Content of Tab Pane 1
-          </TabPane>
-          <TabPane tab="Tab 2" key="2">
-            Content of Tab Pane 2
-          </TabPane>
-          <TabPane tab="Tab 3" key="3">
-            Content of Tab Pane 3
-          </TabPane>
-        </Tabs>
+        <Tabs
+          type="card"
+          items={[
+            { key: '1', label: 'Tab 1', children: 'Content of Tab Pane 1' },
+            { key: '2', label: 'Tab 2', children: 'Content of Tab Pane 2' },
+            { key: '3', label: 'Tab 3', children: 'Content of Tab Pane 3' },
+          ]}
+        />
         <Timeline>
           <Timeline.Item>Create a services site 2015-09-01</Timeline.Item>
           <Timeline.Item>Solve initial network problems 2015-09-01</Timeline.Item>
@@ -1341,7 +1337,7 @@ export default App;
 ```tsx
 import React, { useState } from 'react';
 import { Button, Flex, Modal } from 'antd';
-import type { ModalProps } from 'antd';
+import type { GetProp, ModalProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const lineStyle: React.CSSProperties = {
   lineHeight: '28px',
@@ -1371,7 +1367,7 @@ const styles: ModalProps['styles'] = {
     backgroundImage: `linear-gradient(to top, #18181b 0, rgba(21, 21, 22, 0.2) 100%)`,
   },
 };
-const stylesFn: ModalProps['styles'] = (info) => {
+const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Return'> => {
   if (info.props.footer) {
     return {
       container: {
@@ -1390,7 +1386,7 @@ const stylesFn: ModalProps['styles'] = (info) => {
         padding: '16px 10px',
         backgroundColor: '#fafafa',
       },
-    } satisfies ModalProps['styles'];
+    };
   }
   return {};
 };
