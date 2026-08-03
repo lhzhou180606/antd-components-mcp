@@ -83,24 +83,27 @@ const App: React.FC = () => (
 export default App;
 ```
 ### 图标
-有图标的标签。
+有图标的标签。`icon` 也支持第三方图标库的裸 `<svg>` 元素，会自动与文字居中对齐。
 
 ```tsx
 import React from 'react';
 import { AndroidOutlined, AppleOutlined } from '@ant-design/icons';
 import { Tabs } from 'antd';
+// Icons from third-party libraries (e.g. lucide, react-icons) render as a bare `<svg>`
+// rather than an `.anticon` wrapper. It stays vertically centred with the label.
+const HeartIcon: React.FC = () => (
+  <svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+    <path d="M12 20.7l-1.4-1.3C5.4 14.8 2 11.7 2 8a5 5 0 0 1 10-1.7A5 5 0 0 1 22 8c0 3.7-3.4 6.8-8.6 11.4L12 20.7z" />
+  </svg>
+);
 const App: React.FC = () => (
   <Tabs
     defaultActiveKey="2"
-    items={[AppleOutlined, AndroidOutlined].map((Icon, i) => {
-      const id = String(i + 1);
-      return {
-        key: id,
-        label: `Tab ${id}`,
-        children: `Tab ${id}`,
-        icon: <Icon />,
-      };
-    })}
+    items={[
+      { key: '1', label: 'Tab 1', children: 'Tab 1', icon: <AppleOutlined /> },
+      { key: '2', label: 'Tab 2', children: 'Tab 2', icon: <AndroidOutlined /> },
+      { key: '3', label: 'Tab 3', children: 'Tab 3', icon: <HeartIcon /> },
+    ]}
   />
 );
 export default App;
@@ -184,16 +187,16 @@ export default App;
 
 ```tsx
 import React, { useMemo, useState } from 'react';
-import type { TabBarExtraMap } from '@rc-component/tabs/es/interface';
 import { Button, Checkbox, Divider, Tabs } from 'antd';
 const CheckboxGroup = Checkbox.Group;
 const operations = <Button>Extra Action</Button>;
 const operationsSlot: Record<PositionType, React.ReactNode> = {
-  left: <Button className="tabs-extra-demo-button">Left Extra Action</Button>,
-  right: <Button>Right Extra Action</Button>,
+  left: <Button style={{ marginInlineEnd: 16 }}>Left Extra Action</Button>,
+  right: <Button style={{ marginInlineStart: 16 }}>Right Extra Action</Button>,
 };
 const options = ['left', 'right'];
 type PositionType = 'left' | 'right';
+type TabBarExtraMap = Partial<Record<PositionType, React.ReactNode>>;
 const items = Array.from({ length: 3 }).map((_, i) => {
   const id = String(i + 1);
   return {
@@ -484,13 +487,14 @@ export default App;
 import React from 'react';
 import { Tabs } from 'antd';
 import { createStyles } from 'antd-style';
-const useStyle = createStyles(({ token, css }) => {
-  const antdTabsCls = '.ant-tabs';
+const useStyle = createStyles((props) => {
+  const { cssVar, prefixCls, css } = props;
+  const antdTabsCls = `.${prefixCls}-tabs`;
   return css`
     ${antdTabsCls}${antdTabsCls}-card {
-      ${antdTabsCls}-content {
-        padding: ${token.padding}px;
-        background: ${token.colorBgContainer};
+      ${antdTabsCls}-body {
+        padding: ${cssVar.padding};
+        background: ${cssVar.colorBgContainer};
       }
       ${antdTabsCls}-nav {
         margin: 0;
@@ -498,8 +502,8 @@ const useStyle = createStyles(({ token, css }) => {
           background: transparent;
           border-color: transparent;
           &-active {
-            border-color: ${token.colorBorderBg};
-            background: ${token.colorBgContainer};
+            border-color: ${cssVar.colorBorderBg};
+            background: ${cssVar.colorBgContainer};
           }
         }
         &::before {
@@ -636,20 +640,38 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, prefixCls } = props;
+  return {
+    root: css`
+      margin: 0;
+      &.${prefixCls}-tabs-editable {
+        .${prefixCls}-tabs-nav {
+          .${prefixCls}-tabs-tab {
+            /* set transition to none when type="editable-card" */
+            transition: none;
+          }
+        }
+      }
+    `,
+  };
+});
 interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
   'data-node-key': string;
 }
-const DraggableTabNode: React.FC<Readonly<DraggableTabPaneProps>> = ({ className, ...props }) => {
+const DraggableTabNode: React.FC<Readonly<DraggableTabPaneProps>> = (props) => {
+  const { className, ...rest } = props;
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props['data-node-key'],
+    id: rest['data-node-key'],
   });
   const style: React.CSSProperties = {
-    ...props.style,
+    ...rest.style,
     transform: CSS.Translate.toString(transform),
     transition,
     cursor: 'move',
   };
-  return React.cloneElement(props.children as React.ReactElement<any>, {
+  return React.cloneElement(rest.children as React.ReactElement<any>, {
     ref: setNodeRef,
     style,
     ...attributes,
@@ -657,6 +679,7 @@ const DraggableTabNode: React.FC<Readonly<DraggableTabPaneProps>> = ({ className
   });
 };
 const App: React.FC = () => {
+  const { styles } = useStyles();
   const [items, setItems] = useState<NonNullable<TabsProps['items']>>([
     { key: '1', label: 'Tab 1', children: 'Content of Tab Pane 1' },
     { key: '2', label: 'Tab 2', children: 'Content of Tab Pane 2' },
@@ -675,6 +698,7 @@ const App: React.FC = () => {
   return (
     <Tabs
       items={items}
+      rootClassName={styles.root}
       renderTabBar={(tabBarProps, DefaultTabBar) => (
         <DndContext sensors={[sensor]} onDragEnd={onDragEnd} collisionDetection={closestCenter}>
           <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
@@ -702,7 +726,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Tabs } from 'antd';
-import type { TabsProps } from 'antd';
+import type { GetProp, TabsProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -717,14 +741,15 @@ const stylesObject: TabsProps['styles'] = {
   header: { backgroundColor: 'rgba(245,245,245,0.5)' },
   item: { fontWeight: 'bold', color: '#1890ff', padding: `6px 10px` },
   indicator: { backgroundColor: 'rgba(255,77,79, 0.3)', height: 4 },
-  content: { backgroundColor: 'rgba(230,247,255,0.8)', padding: 16 },
+  body: { backgroundColor: 'rgba(230,247,255,0.8)' },
+  content: { padding: 16 },
 };
-const stylesFn: TabsProps['styles'] = (info) => {
+const stylesFn: TabsProps['styles'] = (info): GetProp<TabsProps, 'styles', 'Return'> => {
   if (info.props.type === 'card') {
     return {
       root: { backgroundColor: 'rgba(250,250,250, 0.8)', borderColor: '#d9d9d9' },
       header: { textAlign: 'start' },
-    } satisfies TabsProps['styles'];
+    };
   }
   return {};
 };

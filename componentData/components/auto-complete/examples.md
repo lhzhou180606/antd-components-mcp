@@ -149,6 +149,31 @@ export default App;
 import React from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { AutoComplete, Flex, Input } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, prefixCls, cssVar } = props;
+  return {
+    categorySearch: css`
+      .${prefixCls}-select-dropdown-menu-item-group-title {
+        color: #666;
+        font-weight: ${cssVar.fontWeightStrong};
+      }
+      .${prefixCls}-select-dropdown-menu-item-group {
+        border-bottom: ${cssVar.lineWidth} ${cssVar.lineType} #f6f6f6;
+      }
+      .${prefixCls}-select-dropdown-menu-item {
+        padding-inline-start: ${cssVar.padding};
+      }
+      .${prefixCls}-select-dropdown-menu-item.show-all {
+        text-align: center;
+        cursor: default;
+      }
+      .${prefixCls}-select-dropdown-menu {
+        max-height: 300px;
+      }
+    `,
+  };
+});
 const Title: React.FC<Readonly<{ title?: string }>> = (props) => (
   <Flex align="center" justify="space-between">
     {props.title}
@@ -182,20 +207,19 @@ const options = [
     options: [renderItem('AntDesign design language', 100000)],
   },
 ];
-const App: React.FC = () => (
-  <AutoComplete
-    classNames={{
-      popup: {
-        root: 'certain-category-search-dropdown',
-      },
-    }}
-    popupMatchSelectWidth={500}
-    style={{ width: 250 }}
-    options={options}
-  >
-    <Input.Search size="large" placeholder="input here" />
-  </AutoComplete>
-);
+const App: React.FC = () => {
+  const { styles } = useStyles();
+  return (
+    <AutoComplete
+      classNames={{ popup: { root: styles.categorySearch } }}
+      popupMatchSelectWidth={500}
+      style={{ width: 250 }}
+      options={options}
+    >
+      <Input.Search size="large" placeholder="input here" />
+    </AutoComplete>
+  );
+};
 export default App;
 ```
 ### 查询模式 - 不确定类目
@@ -392,7 +416,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { AutoComplete, Flex } from 'antd';
-import type { AutoCompleteProps } from 'antd';
+import type { AutoCompleteProps, GetProp } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -406,7 +430,9 @@ const stylesObject: AutoCompleteProps['styles'] = {
     listItem: { color: '#272727' },
   },
 };
-const stylesFn: AutoCompleteProps['styles'] = ({ props }) => {
+const stylesFn: AutoCompleteProps['styles'] = ({
+  props,
+}): GetProp<AutoCompleteProps, 'styles', 'Return'> => {
   if (props.variant === 'filled') {
     return {
       popup: {
@@ -414,7 +440,7 @@ const stylesFn: AutoCompleteProps['styles'] = ({ props }) => {
         list: { backgroundColor: 'rgba(240,240,240, 0.85)' },
         listItem: { color: '#272727' },
       },
-    } satisfies AutoCompleteProps['styles'];
+    };
   }
   return {};
 };
@@ -445,6 +471,65 @@ const App: React.FC = () => {
     </Flex>
   );
 };
+export default App;
+```
+### 禁用自定义输入 Debug
+禁用自定义输入组件 Debug。
+
+```tsx
+import React from 'react';
+import { AutoComplete, Flex, Input, Select } from 'antd';
+const App: React.FC = () => (
+  <Flex gap={12} wrap>
+    <Input disabled placeholder="Regular Input" />
+    <AutoComplete disabled>
+      <Input.TextArea disabled />
+    </AutoComplete>
+    <Select disabled options={[]} />
+  </Flex>
+);
+export default App;
+```
+### 禁用文字颜色在 Form 中 Debug
+禁用状态下的文字颜色 Debug：AutoComplete 在禁用的 Form 中以及直接禁用时，输入框文字均应使用禁用色。
+
+```tsx
+import React from 'react';
+import { AutoComplete, Flex, Form } from 'antd';
+const options = [{ value: 'Disabled Value' }];
+const App: React.FC = () => (
+  <Flex vertical gap={12} style={{ width: 240 }}>
+    <Form disabled>
+      <Form.Item label="Form disabled" style={{ marginBottom: 0 }}>
+        <AutoComplete value="Disabled Value" options={options} />
+      </Form.Item>
+    </Form>
+    <AutoComplete disabled value="Disabled Value" options={options} />
+  </Flex>
+);
+export default App;
+```
+### 填充形态自定义输入 Debug
+填充形态自定义输入组件 Debug。
+
+```tsx
+import React from 'react';
+import { AutoComplete, Flex, Form, Input } from 'antd';
+const options = [{ value: 'Burnaby' }, { value: 'Seattle' }, { value: 'Los Angeles' }];
+const App: React.FC = () => (
+  <Flex gap={24} wrap>
+    <Form layout="vertical" variant="filled" style={{ width: 280 }}>
+      <Form.Item label="AutoComplete TextArea">
+        <AutoComplete options={options}>
+          <Input.TextArea placeholder="Custom TextArea" />
+        </AutoComplete>
+      </Form.Item>
+      <Form.Item label="Input TextArea">
+        <Input.TextArea placeholder="Compare TextArea" />
+      </Form.Item>
+    </Form>
+  </Flex>
+);
 export default App;
 ```
 ### 在 Form 中 Debugundefined

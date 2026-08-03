@@ -61,6 +61,7 @@ const { Meta } = Card;
 const App: React.FC = () => (
   <Card
     hoverable
+    variant="borderless"
     style={{ width: 240 }}
     cover={
       <img
@@ -121,7 +122,7 @@ const App: React.FC = () => {
       <Switch checked={!loading} onChange={(checked) => setLoading(!checked)} />
       <Card loading={loading} actions={actions} style={{ minWidth: 300 }}>
         <Card.Meta
-          avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />}
+          avatar={<Avatar src="https://api.dicebear.com/10.x/lorelei/svg?seed=1" />}
           title="Card title"
           description={
             <>
@@ -133,7 +134,7 @@ const App: React.FC = () => {
       </Card>
       <Card loading={loading} actions={actions} style={{ minWidth: 300 }}>
         <Card.Meta
-          avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=2" />}
+          avatar={<Avatar src="https://api.dicebear.com/10.x/lorelei/svg?seed=2" />}
           title="Card title"
           description={
             <>
@@ -298,7 +299,7 @@ const App: React.FC = () => (
     ]}
   >
     <Meta
-      avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
+      avatar={<Avatar src="https://api.dicebear.com/10.x/lorelei/svg?seed=8" />}
       title="Card title"
       description="This is the description"
     />
@@ -313,7 +314,7 @@ export default App;
 import React from 'react';
 import { EditOutlined, HeartOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Flex } from 'antd';
-import type { CardMetaProps, CardProps } from 'antd';
+import type { CardMetaProps, CardProps, GetProp } from 'antd';
 import { createStyles } from 'antd-style';
 const { Meta } = Card;
 const useStyles = createStyles(({ token }) => ({
@@ -322,11 +323,11 @@ const useStyles = createStyles(({ token }) => ({
     backgroundColor: token.colorBgContainer,
     borderRadius: token.borderRadius,
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    border: `1px solid ${token.colorBorderSecondary}`,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorBorderSecondary}`,
   },
   header: {
     borderBottom: 'none',
-    paddingBottom: 8,
+    paddingBottom: token.paddingXS,
   },
   body: {
     paddingTop: 0,
@@ -342,7 +343,7 @@ const stylesCard: CardProps['styles'] = {
     fontWeight: 500,
   },
 };
-const stylesCardFn: CardProps['styles'] = (info) => {
+const stylesCardFn: CardProps['styles'] = (info): GetProp<CardProps, 'styles', 'Return'> => {
   if (info.props.variant === 'outlined') {
     return {
       root: {
@@ -358,7 +359,7 @@ const stylesCardFn: CardProps['styles'] = (info) => {
         fontWeight: 500,
         color: '#A7AAE1',
       },
-    } satisfies CardProps['styles'];
+    };
   }
 };
 const stylesCardMeta: CardMetaProps['styles'] = {
@@ -381,7 +382,7 @@ const App: React.FC = () => {
     actions,
   };
   const sharedCardMetaProps: CardMetaProps = {
-    avatar: <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />,
+    avatar: <Avatar src="https://api.dicebear.com/10.x/lorelei/svg?seed=1" />,
     description: 'This is the description',
   };
   return (
@@ -408,6 +409,76 @@ const App: React.FC = () => {
         <Meta {...sharedCardMetaProps} styles={stylesCardMeta} title="Function Card Meta title" />
       </Card>
     </Flex>
+  );
+};
+export default App;
+```
+### 封面和操作区不渲染 body
+```tsx
+import React from 'react';
+import { Card } from 'antd';
+const App: React.FC = () => (
+  <Card
+    style={{ width: 300 }}
+    cover={<img alt="example" src="https://api.dicebear.com/10.x/lorelei/svg?seed=8" />}
+    actions={[<span key="setting">setting</span>, <span key="edit">edit</span>]}
+  />
+);
+export default App;
+```
+### 按钮对齐
+```tsx
+import React from 'react';
+import { SmileOutlined } from '@ant-design/icons';
+import { Button, Card, ConfigProvider, Flex, Popconfirm } from 'antd';
+import type { GetProp } from 'antd';
+import { createStyles } from 'antd-style';
+const { _InternalPanelDoNotUseOrYouWillBeFired: InternalPopconfirm } = Popconfirm;
+const useStyle = createStyles(({ css }) => ({
+  icon: css`
+    background: rgba(255, 0, 0, 0.1);
+    span {
+      background: rgba(0, 255, 0, 0.5);
+    }
+  `,
+  content: css`
+    background: rgba(0, 0, 255, 0.1);
+  `,
+}));
+const App: React.FC = () => {
+  const { styles } = useStyle();
+  const btnCls: GetProp<typeof Button, 'classNames'> = {
+    icon: styles.icon,
+    content: styles.content,
+  };
+  return (
+    <ConfigProvider button={{ classNames: btnCls }}>
+      <Flex vertical gap="middle">
+        <Card
+          className="line-card"
+          title="#57727 Card extra"
+          extra={<Button icon={<SmileOutlined />}>Test</Button>}
+        >
+          Button in Card extra should be vertically centered with the title.
+        </Card>
+        <Card title="#57896 regression minimum case">
+          <div className="simulate-57896">
+            <div className="inline-buttons">
+              <Button>Cancel</Button>
+              <Button type="primary" icon={<SmileOutlined />}>
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </Card>
+        <InternalPopconfirm
+          title="Are you OK?"
+          okButtonProps={{
+            icon: <SmileOutlined />,
+          }}
+        />
+      </Flex>
+    </ConfigProvider>
   );
 };
 export default App;
