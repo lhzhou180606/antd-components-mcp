@@ -3,36 +3,36 @@
 - 需要对输入的数据类型进行校验时。
 ## API
 ### Form
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| classNames | 用于自定义组件内部各语义化结构的 class，支持对象或函数 | Record<[SemanticDOM](#semantic-dom), string> \| (info: { props })=> Record<[SemanticDOM](#semantic-dom), string> | - |  |
-| colon | 配置 Form.Item 的 `colon` 的默认值。表示是否显示 label 后面的冒号 (只有在属性 layout 为 horizontal 时有效) | boolean | true |  |
-| disabled | 设置表单组件禁用，仅对 antd 组件有效 | boolean | false | 4.21.0 |
-| component | 设置 Form 渲染元素，为 `false` 则不创建 DOM 节点 | ComponentType \| false | form |  |
-| fields | 通过状态管理（如 redux）控制表单字段，如非强需求不推荐使用。查看[示例](#form-demo-global-state) | [FieldData](#fielddata)\[] | - |  |
-| form | 经 `Form.useForm()` 创建的 form 控制实例，不提供时会自动创建 | [FormInstance](#forminstance) | - |  |
-| feedbackIcons | 当 `Form.Item` 有 `hasFeedback` 属性时可以自定义图标 | [FeedbackIcons](#feedbackicons) | - | 5.9.0 |
-| initialValues | 表单默认值，只有初始化以及重置时生效 | object | - |  |
-| labelAlign | label 标签的文本对齐方式 | `left` \| `right` | `right` |  |
-| labelWrap | label 标签的文本换行方式 | boolean | false | 4.18.0 |
-| labelCol | label 标签布局，同 `<Col>` 组件，设置 `span` `offset` 值，如 `{span: 3, offset: 12}` 或 `sm: {span: 3, offset: 12}` | [object](/components/grid-cn#col) | - |  |
-| layout | 表单布局 | `horizontal` \| `vertical` \| `inline` | `horizontal` |  |
-| name | 表单名称，会作为表单字段 `id` 前缀使用 | string | - |  |
-| preserve | 当字段被删除时保留字段值。你可以通过 `getFieldsValue(true)` 来获取保留字段值 | boolean | true | 4.4.0 |
-| requiredMark | 必选样式，可以切换为必选或者可选展示样式。此为 Form 配置，Form.Item 无法单独配置 | boolean \| `optional` \| ((label: ReactNode, info: { required: boolean }) => ReactNode) | true | `renderProps`: 5.9.0 |
-| scrollToFirstError | 提交失败自动滚动到第一个错误字段 | boolean \| [Options](https://github.com/stipsan/scroll-into-view-if-needed/tree/ece40bd9143f48caf4b99503425ecb16b0ad8249#options) \| { focus: boolean } | false | focus: 5.24.0 |
-| size | 设置字段组件的尺寸（仅限 antd 组件） | `small` \| `medium` \| `large` | - |  |
-| styles | 用于自定义组件内部各语义化结构的行内 style，支持对象或函数 | Record<[SemanticDOM](#semantic-dom), CSSProperties> \| (info: { props })=> Record<[SemanticDOM](#semantic-dom), CSSProperties> | - |  |
-| tooltip | 配置提示属性 | [TooltipProps](/components/tooltip-cn#api) & { icon?: ReactNode } | - | 6.3.0 |
-| validateMessages | 验证提示模板，说明[见下](#validatemessages) | [ValidateMessages](https://github.com/ant-design/ant-design/blob/6234509d18bac1ac60fbb3f92a5b2c6a6361295a/components/locale/en_US.ts#L88-L134) | - |  |
-| validateTrigger | 统一设置字段触发验证的时机 | string \| string\[] | `onChange` | 4.3.0 |
-| variant | 表单内控件变体 | `outlined` \| `borderless` \| `filled` \| `underlined` | `outlined` | 5.13.0 \| `underlined`: 5.24.0 |
-| wrapperCol | 需要为输入控件设置布局样式时，使用该属性，用法同 labelCol | [object](/components/grid-cn#col) | - |  |
-| onFieldsChange | 字段更新时触发回调事件 | function(changedFields, allFields) | - |  |
-| onFinish | 提交表单且数据验证成功后回调事件 | function(values) | - |  |
-| onFinishFailed | 提交表单且数据验证失败后回调事件 | function({ values, errorFields, outOfDate }) | - |  |
-| onValuesChange | 字段值更新时触发回调事件 | function(changedValues, allValues) | - |  |
-| clearOnDestroy | 当表单被卸载时清空表单值 | boolean | false | 5.18.0 |
+| 参数 | 说明 | 类型 | 默认值 | 版本 | [全局配置](/components/config-provider-cn#component-config) |
+| --- | --- | --- | --- | --- | --- |
+| classNames | 用于自定义组件内部各语义化结构的 class，支持对象或函数 | Record<[SemanticDOM](#semantic-dom), string> \| (info: { props })=> Record<[SemanticDOM](#semantic-dom), string> | - |  | 6.0.0 |
+| colon | 配置 Form.Item 的 `colon` 的默认值。表示是否显示 label 后面的冒号 (只有在属性 layout 为 horizontal 时有效) | boolean | true |  | 4.18.0 |
+| disabled | 设置表单组件禁用，仅对 antd 组件有效 | boolean | false | 4.21.0 | × |
+| component | 设置 Form 渲染元素，为 `false` 则不创建 DOM 节点 | ComponentType \| false | form |  | × |
+| fields | 通过状态管理（如 redux）控制表单字段，如非强需求不推荐使用。查看[示例](#form-demo-global-state) | [FieldData](#fielddata)\[] | - |  | × |
+| form | 经 `Form.useForm()` 创建的 form 控制实例，不提供时会自动创建 | [FormInstance](#forminstance) | - |  | × |
+| feedbackIcons | 当 `Form.Item` 有 `hasFeedback` 属性时可以自定义图标 | [FeedbackIcons](#feedbackicons) | - | 5.9.0 | × |
+| initialValues | 表单默认值，只有初始化以及重置时生效 | object | - |  | × |
+| labelAlign | label 标签的文本对齐方式 | `left` \| `right` | `right` |  | 6.4.0 |
+| labelWrap | label 标签的文本换行方式 | boolean | false | 4.18.0 | × |
+| labelCol | label 标签布局，同 `<Col>` 组件，设置 `span` `offset` 值，如 `{span: 3, offset: 12}` 或 `sm: {span: 3, offset: 12}` | [object](/components/grid-cn#col) | - |  | × |
+| layout | 表单布局 | `horizontal` \| `vertical` \| `inline` | `horizontal` |  | × |
+| name | 表单名称，会作为表单字段 `id` 前缀使用 | string | - |  | × |
+| preserve | 当字段被删除时保留字段值。你可以通过 `getFieldsValue(true)` 来获取保留字段值 | boolean | true | 4.4.0 | × |
+| requiredMark | 必选样式，可以切换为必选或者可选展示样式。此为 Form 配置，Form.Item 无法单独配置 | boolean \| `optional` \| ((label: ReactNode, info: { required: boolean }) => ReactNode) | true | `renderProps`: 5.9.0 | 4.8.0 |
+| scrollToFirstError | 提交失败自动滚动到第一个错误字段 | boolean \| [Options](https://github.com/stipsan/scroll-into-view-if-needed/tree/ece40bd9143f48caf4b99503425ecb16b0ad8249#options) \| { focus: boolean } | false | focus: 5.24.0 | 5.2.0 |
+| size | 设置字段组件的尺寸（仅限 antd 组件） | `small` \| `medium` \| `large` | - |  | × |
+| styles | 用于自定义组件内部各语义化结构的行内 style，支持对象或函数 | Record<[SemanticDOM](#semantic-dom), CSSProperties> \| (info: { props })=> Record<[SemanticDOM](#semantic-dom), CSSProperties> | - |  | 6.0.0 |
+| tooltip | 配置提示属性 | [TooltipProps](/components/tooltip-cn#api) & { icon?: ReactNode } | - | 6.3.0 | 6.3.0 |
+| validateMessages | 验证提示模板，说明[见下](#validatemessages) | [ValidateMessages](https://github.com/ant-design/ant-design/blob/6234509d18bac1ac60fbb3f92a5b2c6a6361295a/components/locale/en_US.ts#L88-L134) | - |  | 4.0.0 |
+| validateTrigger | 统一设置字段触发验证的时机 | string \| string\[] | `onChange` | 4.3.0 | × |
+| variant | 表单内控件变体 | `outlined` \| `borderless` \| `filled` \| `underlined` | `outlined` | 5.13.0 \| `underlined`: 5.24.0 | 5.19.0 |
+| wrapperCol | 需要为输入控件设置布局样式时，使用该属性，用法同 labelCol | [object](/components/grid-cn#col) | - |  | × |
+| onFieldsChange | 字段更新时触发回调事件 | function(changedFields, allFields) | - |  | × |
+| onFinish | 提交表单且数据验证成功后回调事件 | function(values) | - |  | × |
+| onFinishFailed | 提交表单且数据验证失败后回调事件 | function({ values, errorFields, outOfDate }) | - |  | × |
+| onValuesChange | 字段值更新时触发回调事件 | function(changedValues, allValues) | - |  | × |
+| clearOnDestroy | 当表单被卸载时清空表单值 | boolean | false | 5.18.0 | × |
 > 支持原生 form 除 `onSubmit` 外的所有属性。
 ### validateMessages
 Form 为验证提供了[默认的错误提示信息](https://github.com/ant-design/ant-design/blob/6234509d18bac1ac60fbb3f92a5b2c6a6361295a/components/locale/en_US.ts#L88-L134)，你可以通过配置 `validateMessages` 属性，修改对应的提示模板。一种常见的使用方式，是配置国际化提示信息：
@@ -141,7 +141,7 @@ Form 通过增量更新方式，只更新被修改的字段相关组件以达到
   </Form.Item>
 </Form>
 ```
-自 `5.20.2` 起，当你希望不要转译 `${}` 时，你可以通过 `\\${}` 来略过：
+自 `5.20.2` 起，当你希望不要转译 `${}` 时，你可以通过 `\\${}` 来跳过：
 ```jsx
 { required: true, message: '${label} is convert, \\${label} is not convert' }
 // good is convert, ${label} is not convert
@@ -387,7 +387,7 @@ type Rule = RuleConfig | ((form: FormInstance) => RuleConfig);
 | pattern | 正则表达式匹配 | RegExp |  |
 | required | 是否为必选字段 | boolean |  |
 | transform | 将字段值转换成目标值后进行校验 | (value) => any |  |
-| type | 类型，常见有 `string` \|`number` \|`boolean` \|`url` \| `email` \| `tel`。更多请参考[此处](https://github.com/react-component/async-validator#type) | string |  |
+| type | 类型，常见有 `string` \| `number` \| `boolean` \| `url` \| `email` \| `tel`。更多请参考[此处](https://github.com/react-component/async-validator#type) | string |  |
 | validateTrigger | 设置触发验证时机，必须是 Form.Item 的 `validateTrigger` 的子集 | string \| string\[] |  |
 | validator | 自定义校验，接收 Promise 作为返回值。[示例](#form-demo-register)参考 | ([rule](#rule), value) => Promise |  |
 | warningOnly | 仅警告，不阻塞表单提交 | boolean | 4.17.0 |
@@ -472,6 +472,8 @@ React 中异步更新会导致受控组件交互行为异常。当用户交互�
 当自定义组件不支持 `ref` 时，Form 无法获取子元素真实 DOM 节点，而通过包裹 Class Component 调用 `findDOMNode` 会在 React Strict Mode 下触发警告。因而我们使用 id 来进行元素定位。
 ### `setFieldsValue` 不会触发 `onFieldsChange` 和 `onValuesChange`？ {#faq-set-fields-no-trigger}
 是的，change 事件仅当用户交互才会触发。该设计是为了防止在 change 事件中调用 `setFieldsValue` 导致的循环问题。如果仅仅需要组件内消费，可以通过 `useWatch` 或者 `Field.renderProps` 来实现。
+### 为什么 `dependencies` 不能响应 `setFieldsValue` 触发的更新？ {#faq-dependencies-set-fields}
+`dependencies` 主要用于字段间的校验联动，依赖字段由用户交互触发更新时，会重新触发当前字段的更新与校验。如果需要根据 `setFieldsValue` 后的值变化来渲染额外内容或切换字段选项，请使用 `shouldUpdate` 或 `useWatch`。
 ### 为什么 Form.Item 嵌套子组件后，不更新表单值？ {#faq-item-nested-update}
 Form.Item 在渲染时会注入 `value` 与 `onChange` 事件给子元素，当你的字段组件被包裹时属性将无法传递。所以以下代码是不会生效的：
 ```jsx

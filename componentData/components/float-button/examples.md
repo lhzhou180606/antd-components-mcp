@@ -261,25 +261,116 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 可拖拽
+通过集成第三方库，实现拖拽功能。
+
+```tsx
+import React from 'react';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext, PointerSensor, useDraggable, useSensor, useSensors } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import { FloatButton } from 'antd';
+interface Position {
+  x: number;
+  y: number;
+}
+interface DraggableButtonProps {
+  position: Position;
+}
+const DraggableButton: React.FC<DraggableButtonProps> = (props) => {
+  const { position } = props;
+  const { attributes, isDragging, listeners, setNodeRef, transform } = useDraggable({
+    id: 'draggable-float-button',
+  });
+  const mergedTransform = CSS.Translate.toString({
+    x: position.x + (transform?.x ?? 0),
+    y: position.y + (transform?.y ?? 0),
+    scaleX: transform?.scaleX ?? 1,
+    scaleY: transform?.scaleY ?? 1,
+  });
+  return (
+    <FloatButton
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={{
+        transform: mergedTransform,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        transition: isDragging ? 'none' : undefined,
+        touchAction: 'none',
+      }}
+    />
+  );
+};
+const Demo: React.FC = () => {
+  const [position, setPosition] = React.useState<Position>({ x: 0, y: 0 });
+  const sensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  const sensors = useSensors(sensor);
+  const onDragEnd = (event: DragEndEvent) => {
+    const { delta } = event;
+    setPosition(({ x, y }) => ({ x: x + delta.x, y: y + delta.y }));
+  };
+  return (
+    <DndContext sensors={sensors} onDragEnd={onDragEnd} id="float-button-draggable">
+      <DraggableButton position={position} />
+    </DndContext>
+  );
+};
+export default Demo;
+```
 ### 回到顶部
 返回页面顶部的操作按钮。
 
 ```tsx
 import React from 'react';
 import { FloatButton } from 'antd';
-const App: React.FC = () => (
-  <div style={{ height: '300vh', padding: 10 }}>
-    <div>Scroll to bottom</div>
-    <div>Scroll to bottom</div>
-    <div>Scroll to bottom</div>
-    <div>Scroll to bottom</div>
-    <div>Scroll to bottom</div>
-    <div>Scroll to bottom</div>
-    <div>Scroll to bottom</div>
-    <FloatButton.BackTop />
-  </div>
-);
-export default App;
+const Demo: React.FC = () => {
+  return (
+    <div style={{ height: '300vh', padding: 10 }}>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <FloatButton.BackTop style={{ insetInlineEnd: 24 }} shape="circle" />
+      <FloatButton.BackTop style={{ insetInlineEnd: 88 }} shape="square" />
+    </div>
+  );
+};
+export default Demo;
+```
+### 滚动进度
+通过 `showProgress` 在回到顶部按钮边缘展示当前滚动进度。
+
+```tsx
+import React from 'react';
+import { FloatButton } from 'antd';
+const sharedProps: React.ComponentProps<typeof FloatButton.BackTop> = {
+  showProgress: true,
+  visibilityHeight: 0,
+};
+const Demo: React.FC = () => {
+  return (
+    <div style={{ height: '300vh', padding: 10 }}>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <div>Scroll to bottom</div>
+      <FloatButton.BackTop {...sharedProps} style={{ insetInlineEnd: 24 }} shape="circle" />
+      <FloatButton.BackTop {...sharedProps} style={{ insetInlineEnd: 88 }} shape="square" />
+    </div>
+  );
+};
+export default Demo;
 ```
 ### 徽标数
 右上角附带圆形徽标数字的悬浮按钮。
@@ -339,11 +430,11 @@ export default App;
 import React from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { FloatButton } from 'antd';
-import type { FloatButtonProps } from 'antd';
+import type { FloatButtonProps, GetProp } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
-    border: `1px solid ${token.colorBorder}`,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorBorder}`,
     borderRadius: token.borderRadius,
     padding: `${token.paddingXS}px ${token.padding}px`,
     height: 'auto',
@@ -357,7 +448,9 @@ const stylesObject: FloatButtonProps['styles'] = {
     boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
   },
 };
-const stylesFn: FloatButtonProps['styles'] = (info) => {
+const stylesFn: FloatButtonProps['styles'] = (
+  info,
+): GetProp<FloatButtonProps, 'styles', 'Return'> => {
   if (info.props.type === 'primary') {
     return {
       root: {
@@ -366,9 +459,8 @@ const stylesFn: FloatButtonProps['styles'] = (info) => {
       content: {
         color: '#fff',
       },
-    } satisfies FloatButtonProps['styles'];
+    };
   }
-  return {};
 };
 const App: React.FC = () => {
   const { styles: classNames } = useStyles();
