@@ -74,8 +74,23 @@ export default App;
 ```tsx
 import React, { useCallback, useRef, useState } from 'react';
 import { Mentions } from 'antd';
+import { createStyles } from 'antd-style';
 import debounce from 'lodash/debounce';
+const useStyles = createStyles((props) => {
+  const { css, cssVar } = props;
+  return {
+    optionItem: css`
+      position: relative;
+    `,
+    avatarImage: css`
+      width: 20px;
+      height: 20px;
+      margin-inline-end: ${cssVar.marginXS};
+    `,
+  };
+});
 const App: React.FC = () => {
+  const { styles } = useStyles();
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<{ login: string; avatar_url: string }[]>([]);
   const ref = useRef<string>(null);
@@ -110,10 +125,16 @@ const App: React.FC = () => {
       options={users.map(({ login, avatar_url: avatar }) => ({
         key: login,
         value: login,
-        className: 'antd-demo-dynamic-option',
+        className: styles.optionItem,
         label: (
           <>
-            <img draggable={false} src={avatar} alt={login} />
+            <img
+              className={styles.avatarImage}
+              draggable={false}
+              src={avatar}
+              title={login}
+              alt={login}
+            />
             <span>{login}</span>
           </>
         ),
@@ -301,6 +322,51 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 自定义弹出层
+使用 `popupRender` 对下拉菜单进行自定义渲染。
+
+```tsx
+import React from 'react';
+import { Divider, Mentions, theme } from 'antd';
+const App: React.FC = () => {
+  const { token } = theme.useToken();
+  return (
+    <Mentions
+      style={{ width: '100%' }}
+      popupRender={(menu) => (
+        <>
+          <div
+            style={{
+              padding: `${token.paddingXS}px ${token.paddingSM}px`,
+              fontWeight: token.fontWeightStrong,
+              color: token.colorTextDescription,
+            }}
+          >
+            Custom Header
+          </div>
+          <Divider style={{ margin: `${token.marginXXS}px 0` }} />
+          {menu}
+        </>
+      )}
+      options={[
+        {
+          value: 'afc163',
+          label: 'afc163',
+        },
+        {
+          value: 'zombieJ',
+          label: 'zombieJ',
+        },
+        {
+          value: 'yesmeck',
+          label: 'yesmeck',
+        },
+      ]}
+    />
+  );
+};
+export default App;
+```
 ### 带移除图标
 自定义清除按钮。
 
@@ -471,12 +537,12 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Mentions } from 'antd';
-import type { MentionsProps } from 'antd';
+import type { GetProp, MentionsProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
-    border: `1px solid ${token.colorPrimary}`,
-    borderRadius: 8,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorPrimary}`,
+    borderRadius: token.borderRadiusLG,
     width: 300,
   },
 }));
@@ -493,7 +559,9 @@ const stylesObject: MentionsProps['styles'] = {
     fontWeight: 200,
   },
 };
-const stylesFunction: MentionsProps['styles'] = (info) => {
+const stylesFunction: MentionsProps['styles'] = (
+  info,
+): GetProp<MentionsProps, 'styles', 'Return'> => {
   if (info.props.variant === 'filled') {
     return {
       root: {
@@ -502,7 +570,7 @@ const stylesFunction: MentionsProps['styles'] = (info) => {
       popup: {
         border: '1px solid #722ed1',
       },
-    } satisfies MentionsProps['styles'];
+    };
   }
 };
 const App: React.FC = () => {
