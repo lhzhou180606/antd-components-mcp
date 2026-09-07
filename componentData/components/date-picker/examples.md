@@ -5,20 +5,20 @@
 ```tsx
 import React from 'react';
 import type { DatePickerProps } from 'antd';
-import { DatePicker, Space } from 'antd';
+import { DatePicker, Flex } from 'antd';
 const onChange: DatePickerProps['onChange'] = (date, dateString) => {
   console.log(date, dateString);
 };
-const App: React.FC = () => (
-  <Space vertical>
+const Demo: React.FC = () => (
+  <Flex gap="small" justify="flex-start" align="flex-start" vertical>
     <DatePicker onChange={onChange} />
     <DatePicker onChange={onChange} picker="week" />
     <DatePicker onChange={onChange} picker="month" />
     <DatePicker onChange={onChange} picker="quarter" />
     <DatePicker onChange={onChange} picker="year" />
-  </Space>
+  </Flex>
 );
-export default App;
+export default Demo;
 ```
 ### 范围选择器
 通过设置 `picker` 属性，指定范围选择器类型。
@@ -574,7 +574,7 @@ import type { Dayjs } from 'dayjs';
 const App: React.FC = () => {
   const { token } = theme.useToken();
   const style: React.CSSProperties = {
-    border: `1px solid ${token.colorPrimary}`,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorPrimary}`,
     borderRadius: '50%',
   };
   const cellRender: DatePickerProps<Dayjs>['cellRender'] = (current, info) => {
@@ -978,12 +978,12 @@ export default App;
 ```tsx
 import React from 'react';
 import { DatePicker, Flex } from 'antd';
-import type { DatePickerProps } from 'antd';
+import type { DatePickerProps, GetProp } from 'antd';
 import { createStyles } from 'antd-style';
 import type { Dayjs } from 'dayjs';
 const useStyles = createStyles(({ token }) => ({
   root: {
-    border: `1px solid ${token.colorPrimary}`,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorPrimary}`,
     width: 200,
   },
 }));
@@ -991,14 +991,16 @@ const stylesObject: DatePickerProps<Dayjs>['styles'] = {
   input: { fontStyle: 'italic' },
   suffix: { opacity: 0.85 },
 };
-const stylesFn: DatePickerProps<Dayjs>['styles'] = (info) => {
+const stylesFn: DatePickerProps<Dayjs>['styles'] = (
+  info,
+): GetProp<DatePickerProps<Dayjs>, 'styles', 'Return'> => {
   if (info.props.size === 'large') {
     return {
       root: { borderColor: '#722ed1' },
       popup: {
         container: { border: '1px solid #722ed1', borderRadius: 8 },
       },
-    } satisfies DatePickerProps<Dayjs>['styles'];
+    };
   }
   return {};
 };

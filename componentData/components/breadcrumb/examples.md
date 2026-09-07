@@ -28,12 +28,28 @@ const App: React.FC = () => {
 export default App;
 ```
 ### 带有图标的
-图标放在文字前面。
+图标放在文字前面。第三方图标库（如 lucide、react-icons）渲染出的裸 `<svg>` 也会与文字垂直居中并保持间距。
 
 ```tsx
 import React from 'react';
 import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { Breadcrumb } from 'antd';
+// Icons from third-party libraries (e.g. lucide, react-icons) render as a bare `<svg>`
+// rather than an `.anticon` wrapper. It stays centred with, and spaced from, the label.
+const ChartIcon: React.FC = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="1em"
+    height="1em"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    aria-hidden="true"
+  >
+    <path d="M3 3v18h18" />
+    <path d="M7 14l4-4 3 3 5-6" />
+  </svg>
+);
 const App: React.FC = () => (
   <Breadcrumb
     items={[
@@ -47,6 +63,15 @@ const App: React.FC = () => (
           <>
             <UserOutlined />
             <span>Application List</span>
+          </>
+        ),
+      },
+      {
+        href: '',
+        title: (
+          <>
+            <ChartIcon />
+            <span>Dashboard</span>
           </>
         ),
       },
@@ -207,7 +232,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Breadcrumb, Flex } from 'antd';
-import type { BreadcrumbProps } from 'antd';
+import type { BreadcrumbProps, GetProp } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -226,13 +251,15 @@ const styles: BreadcrumbProps['styles'] = {
   item: { color: '#1890ff' },
   separator: { color: 'rgba(0, 0, 0, 0.45)' },
 };
-const stylesFn: BreadcrumbProps['styles'] = (info) => {
+const stylesFn: BreadcrumbProps['styles'] = (
+  info,
+): GetProp<BreadcrumbProps, 'styles', 'Return'> => {
   const items = info.props.items || [];
   if (items.length > 2) {
     return {
       root: { border: '1px solid #F5EFFF', padding: 8, borderRadius: 4 },
       item: { color: '#8F87F1' },
-    } satisfies BreadcrumbProps['styles'];
+    };
   }
   return {};
 };
