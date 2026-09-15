@@ -41,6 +41,57 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 变体配置 Debug
+对比 Input 子组件通过 `input`、子组件全局配置和组件属性设置变体的效果。
+
+```tsx
+import React from 'react';
+import { ConfigProvider, Flex, Input, Typography } from 'antd';
+const App: React.FC = () => (
+  <Flex vertical gap="large">
+    <Flex vertical gap="small">
+      <Typography.Text strong>Input.Search</Typography.Text>
+      <Typography.Text code>ConfigProvider input</Typography.Text>
+      <ConfigProvider input={{ variant: 'filled' }}>
+        <Input.Search placeholder="Filled" />
+      </ConfigProvider>
+      <Typography.Text code>ConfigProvider inputSearch</Typography.Text>
+      <ConfigProvider inputSearch={{ variant: 'filled' }}>
+        <Input.Search placeholder="Filled" />
+      </ConfigProvider>
+      <Typography.Text code>Component prop</Typography.Text>
+      <Input.Search placeholder="Filled" variant="filled" />
+    </Flex>
+    <Flex vertical gap="small">
+      <Typography.Text strong>Input.Password</Typography.Text>
+      <Typography.Text code>ConfigProvider input</Typography.Text>
+      <ConfigProvider input={{ variant: 'filled' }}>
+        <Input.Password placeholder="Filled" />
+      </ConfigProvider>
+      <Typography.Text code>ConfigProvider inputPassword</Typography.Text>
+      <ConfigProvider inputPassword={{ variant: 'filled' }}>
+        <Input.Password placeholder="Filled" />
+      </ConfigProvider>
+      <Typography.Text code>Component prop</Typography.Text>
+      <Input.Password placeholder="Filled" variant="filled" />
+    </Flex>
+    <Flex vertical gap="small">
+      <Typography.Text strong>Input.OTP</Typography.Text>
+      <Typography.Text code>ConfigProvider input</Typography.Text>
+      <ConfigProvider input={{ variant: 'filled' }}>
+        <Input.OTP defaultValue="111111" />
+      </ConfigProvider>
+      <Typography.Text code>ConfigProvider otp</Typography.Text>
+      <ConfigProvider otp={{ variant: 'filled' }}>
+        <Input.OTP defaultValue="222222" />
+      </ConfigProvider>
+      <Typography.Text code>Component prop</Typography.Text>
+      <Input.OTP defaultValue="333333" variant="filled" />
+    </Flex>
+  </Flex>
+);
+export default App;
+```
 ### 面性变体 Debug
 Filled Debug.
 
@@ -224,6 +275,32 @@ import {
   Select,
   Tooltip,
 } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, prefixCls, cssVar } = props;
+  return {
+    inputWrapper: css`
+      position: relative;
+    `,
+    inputSplit: css`
+      background-color: ${cssVar.colorBgContainer} !important;
+    `,
+    inputRight: css`
+      border-inline-start-width: 0;
+      &:hover,
+      &:focus {
+        border-inline-start-width: ${cssVar.lineWidth};
+      }
+      &.${prefixCls}-input-rtl {
+        border-inline-end-width: 0;
+        &:hover,
+        &:focus {
+          border-inline-end-width: ${cssVar.lineWidth};
+        }
+      }
+    `,
+  };
+});
 const options = [
   {
     value: 'zhejiang',
@@ -258,151 +335,149 @@ const options = [
     ],
   },
 ];
-const App: React.FC = () => (
-  <div className="site-input-group-wrapper">
-    <Input.Group size="large">
-      <Row gutter={8}>
-        <Col span={5}>
-          <Input defaultValue="0571" />
-        </Col>
-        <Col span={8}>
-          <Input defaultValue="26888888" />
-        </Col>
-      </Row>
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Input style={{ width: '20%' }} defaultValue="0571" />
-      <Input style={{ width: '30%' }} defaultValue="26888888" />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Input style={{ width: 'calc(100% - 200px)' }} defaultValue="https://ant.design" />
-      <Button type="primary">Submit</Button>
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Input
-        style={{ width: 'calc(100% - 200px)' }}
-        defaultValue="git@github.com:ant-design/ant-design.git"
-      />
-      <Tooltip title="search git url">
-        <Button icon={<SearchOutlined />} />
-      </Tooltip>
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Select
-        defaultValue="Zhejiang"
-        options={[
-          { label: 'Zhejiang', value: 'Zhejiang' },
-          { label: 'Jiangsu', value: 'Jiangsu' },
-          { label: 'Other', value: 'Other' },
-        ]}
-      />
-      <Input style={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Input.Search allowClear style={{ width: '40%' }} defaultValue="0571" />
-      <Input.Search allowClear style={{ width: '40%' }} defaultValue="26888888" />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Select
-        defaultValue="Option1"
-        options={[
-          { label: 'Option1', value: 'Option1' },
-          { label: 'Option2', value: 'Option2' },
-        ]}
-      />
-      <Input style={{ width: '50%' }} defaultValue="input content" />
-      <InputNumber prefix="@" />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Input style={{ width: '50%' }} defaultValue="input content" />
-      <DatePicker style={{ width: '50%' }} />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Input style={{ width: '30%' }} defaultValue="input content" />
-      <DatePicker.RangePicker style={{ width: '70%' }} />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Select
-        defaultValue="Option1-1"
-        options={[
-          { label: 'Option1-1', value: 'Option1-1' },
-          { label: 'Option1-2', value: 'Option1-2' },
-        ]}
-      />
-      <Select
-        defaultValue="Option2-2"
-        options={[
-          { label: 'Option2-1', value: 'Option2-1' },
-          { label: 'Option2-2', value: 'Option2-2' },
-        ]}
-      />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Select
-        defaultValue="1"
-        options={[
-          { label: 'Between', value: '1' },
-          { label: 'Except', value: '2' },
-        ]}
-      />
-      <Input style={{ width: 100, textAlign: 'center' }} placeholder="Minimum" />
-      <Input
-        className="site-input-split"
-        style={{
-          width: 30,
-          borderInlineStart: 0,
-          borderInlineEnd: 0,
-          pointerEvents: 'none',
-        }}
-        placeholder="~"
-        disabled
-      />
-      <Input
-        className="site-input-right"
-        style={{ width: 100, textAlign: 'center' }}
-        placeholder="Maximum"
-      />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Select
-        defaultValue="Sign Up"
-        style={{ width: '30%' }}
-        options={[
-          { label: 'Sign Up', value: 'Sign Up' },
-          { label: 'Sign In', value: 'Sign In' },
-        ]}
-      />
-      <AutoComplete
-        style={{ width: '70%' }}
-        placeholder="Email"
-        options={[{ value: 'text 1' }, { value: 'text 2' }]}
-      />
-    </Input.Group>
-    <br />
-    <Input.Group compact>
-      <Select
-        style={{ width: '30%' }}
-        defaultValue="Home"
-        options={[
-          { label: 'Home', value: 'Home' },
-          { label: 'Company', value: 'Company' },
-        ]}
-      />
-      <Cascader style={{ width: '70%' }} options={options} placeholder="Select Address" />
-    </Input.Group>
-  </div>
-);
+const App: React.FC = () => {
+  const { styles } = useStyles();
+  return (
+    <div className={styles.inputWrapper}>
+      <Input.Group size="large">
+        <Row gutter={8}>
+          <Col span={5}>
+            <Input defaultValue="0571" />
+          </Col>
+          <Col span={8}>
+            <Input defaultValue="26888888" />
+          </Col>
+        </Row>
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Input style={{ width: '20%' }} defaultValue="0571" />
+        <Input style={{ width: '30%' }} defaultValue="26888888" />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Input style={{ width: 'calc(100% - 200px)' }} defaultValue="https://ant.design" />
+        <Button type="primary">Submit</Button>
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Input
+          style={{ width: 'calc(100% - 200px)' }}
+          defaultValue="git@github.com:ant-design/ant-design.git"
+        />
+        <Tooltip title="search git url">
+          <Button icon={<SearchOutlined />} />
+        </Tooltip>
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Select
+          defaultValue="Zhejiang"
+          options={[
+            { label: 'Zhejiang', value: 'Zhejiang' },
+            { label: 'Jiangsu', value: 'Jiangsu' },
+            { label: 'Other', value: 'Other' },
+          ]}
+        />
+        <Input style={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Input.Search allowClear style={{ width: '40%' }} defaultValue="0571" />
+        <Input.Search allowClear style={{ width: '40%' }} defaultValue="26888888" />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Select
+          defaultValue="Option1"
+          options={[
+            { label: 'Option1', value: 'Option1' },
+            { label: 'Option2', value: 'Option2' },
+          ]}
+        />
+        <Input style={{ width: '50%' }} defaultValue="input content" />
+        <InputNumber prefix="@" />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Input style={{ width: '50%' }} defaultValue="input content" />
+        <DatePicker style={{ width: '50%' }} />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Input style={{ width: '30%' }} defaultValue="input content" />
+        <DatePicker.RangePicker style={{ width: '70%' }} />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Select
+          defaultValue="Option1-1"
+          options={[
+            { label: 'Option1-1', value: 'Option1-1' },
+            { label: 'Option1-2', value: 'Option1-2' },
+          ]}
+        />
+        <Select
+          defaultValue="Option2-2"
+          options={[
+            { label: 'Option2-1', value: 'Option2-1' },
+            { label: 'Option2-2', value: 'Option2-2' },
+          ]}
+        />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Select
+          defaultValue="1"
+          options={[
+            { label: 'Between', value: '1' },
+            { label: 'Except', value: '2' },
+          ]}
+        />
+        <Input style={{ width: 100, textAlign: 'center' }} placeholder="Minimum" />
+        <Input
+          className={styles.inputSplit}
+          style={{ width: 30, borderInlineStart: 0, borderInlineEnd: 0, pointerEvents: 'none' }}
+          placeholder="~"
+          disabled
+        />
+        <Input
+          className={styles.inputRight}
+          style={{ width: 100, textAlign: 'center' }}
+          placeholder="Maximum"
+        />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Select
+          defaultValue="Sign Up"
+          style={{ width: '30%' }}
+          options={[
+            { label: 'Sign Up', value: 'Sign Up' },
+            { label: 'Sign In', value: 'Sign In' },
+          ]}
+        />
+        <AutoComplete
+          style={{ width: '70%' }}
+          placeholder="Email"
+          options={[{ value: 'text 1' }, { value: 'text 2' }]}
+        />
+      </Input.Group>
+      <br />
+      <Input.Group compact>
+        <Select
+          style={{ width: '30%' }}
+          defaultValue="Home"
+          options={[
+            { label: 'Home', value: 'Home' },
+            { label: 'Company', value: 'Company' },
+          ]}
+        />
+        <Cascader style={{ width: '70%' }} options={options} placeholder="Select Address" />
+      </Input.Group>
+    </div>
+  );
+};
 export default App;
 ```
 ### 搜索框
@@ -560,14 +635,30 @@ export default App;
 ```tsx
 import React, { useState } from 'react';
 import { Input, Tooltip } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, prefixCls, cssVar } = props;
+  return {
+    numericInput: css`
+      .${prefixCls}-tooltip-container {
+        min-width: 32px;
+        min-height: 38px;
+      }
+    `,
+    numericInputTitle: css`
+      font-size: ${cssVar.fontSize};
+    `,
+  };
+});
 interface NumericInputProps {
   style: React.CSSProperties;
   value: string;
   onChange: (value: string) => void;
 }
 const formatNumber = (value: number) => new Intl.NumberFormat().format(value);
-const NumericInput = (props: NumericInputProps) => {
+const NumericInput: React.FC<NumericInputProps> = (props) => {
   const { value, onChange } = props;
+  const { styles } = useStyles();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value: inputValue } = e.target;
     const reg = /^-?\d*(\.\d*)?$/;
@@ -576,7 +667,7 @@ const NumericInput = (props: NumericInputProps) => {
     }
   };
   // '.' at the end or only '-' in the input box.
-  const handleBlur = () => {
+  const handleBlur: React.FocusEventHandler<HTMLInputElement> = () => {
     let valueTemp = value;
     if (value.charAt(value.length - 1) === '.' || value === '-') {
       valueTemp = value.slice(0, -1);
@@ -584,16 +675,19 @@ const NumericInput = (props: NumericInputProps) => {
     onChange(valueTemp.replace(/0*(\d+)/, '$1'));
   };
   const title = value ? (
-    <span className="numeric-input-title">{value !== '-' ? formatNumber(Number(value)) : '-'}</span>
+    <span className={styles.numericInputTitle}>
+      {value !== '-' ? formatNumber(Number(value)) : '-'}
+    </span>
   ) : (
     'Input a number'
   );
   return (
     <Tooltip
+      destroyOnHidden
       trigger={['focus']}
       title={title}
       placement="topLeft"
-      classNames={{ root: 'numeric-input' }}
+      classNames={{ root: styles.numericInput }}
     >
       <Input
         {...props}
@@ -803,36 +897,28 @@ const App: React.FC = () => {
       <Space wrap>
         <Button
           onClick={() => {
-            inputRef.current!.focus({
-              cursor: 'start',
-            });
+            inputRef.current?.focus({ cursor: 'start' });
           }}
         >
           Focus at first
         </Button>
         <Button
           onClick={() => {
-            inputRef.current!.focus({
-              cursor: 'end',
-            });
+            inputRef.current?.focus({ cursor: 'end' });
           }}
         >
           Focus at last
         </Button>
         <Button
           onClick={() => {
-            inputRef.current!.focus({
-              cursor: 'all',
-            });
+            inputRef.current?.focus({ cursor: 'all' });
           }}
         >
           Focus to select all
         </Button>
         <Button
           onClick={() => {
-            inputRef.current!.focus({
-              preventScroll: true,
-            });
+            inputRef.current?.focus({ preventScroll: true });
           }}
         >
           Focus prevent scroll
@@ -842,7 +928,7 @@ const App: React.FC = () => {
           checkedChildren="Input"
           unCheckedChildren="TextArea"
           onChange={() => {
-            setInput(!input);
+            setInput((prev) => !prev);
           }}
         />
       </Space>
@@ -859,10 +945,10 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Input } from 'antd';
-import type { GetProps } from 'antd';
+import type { GetProp, GetProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const styles = createStaticStyles(({ css, cssVar }) => ({
-  focusEffect: css`
+  root: css`
     border-width: ${cssVar.lineWidth};
     border-radius: ${cssVar.borderRadius};
     transition: box-shadow ${cssVar.motionDurationMid};
@@ -887,45 +973,52 @@ const stylesFn: InputProps['styles'] = (info) => {
       root: {
         borderColor: '#696FC7',
       },
-    } satisfies InputProps['styles'];
+    };
   }
   return {};
 };
-const stylesFnTextArea: TextAreaProps['styles'] = (info) => {
+const stylesFnTextArea: TextAreaProps['styles'] = (
+  info,
+): GetProp<TextAreaProps, 'styles', 'Return'> => {
   if (info.props.showCount) {
     return {
       root: { borderColor: '#BDE3C3' },
       textarea: { resize: 'none' },
       count: { color: '#BDE3C3' },
-    } satisfies TextAreaProps['styles'];
+    };
   }
   return {};
 };
-const stylesFnPassword: PasswordProps['styles'] = (info) => {
+const stylesFnPassword: PasswordProps['styles'] = (
+  info,
+): GetProp<PasswordProps, 'styles', 'Return'> => {
   if (info.props.size === 'medium') {
     return {
       root: {
         borderColor: '#F5D3C4',
       },
-    } satisfies PasswordProps['styles'];
+    };
   }
   return {};
 };
-const stylesFnOTP: OTPProps['styles'] = (info) => {
+const stylesFnOTP: OTPProps['styles'] = (info): GetProp<OTPProps, 'styles', 'Return'> => {
   if (info.props.size === 'medium') {
     return {
+      root: {
+        borderWidth: 0,
+      },
       input: {
         borderColor: '#6E8CFB',
         width: 32,
       },
-    } satisfies OTPProps['styles'];
+    };
   }
   return {};
 };
-const stylesFnSearch: SearchProps['styles'] = (info) => {
+const stylesFnSearch: SearchProps['styles'] = (info): GetProp<SearchProps, 'styles', 'Return'> => {
   if (info.props.size === 'large') {
     return {
-      root: { color: '#4DA8DA' },
+      root: { color: '#4DA8DA', borderWidth: 0 },
       input: { color: '#4DA8DA', borderColor: '#4DA8DA' },
       prefix: { color: '#4DA8DA' },
       suffix: { color: '#4DA8DA' },
@@ -934,7 +1027,7 @@ const stylesFnSearch: SearchProps['styles'] = (info) => {
         root: { color: '#4DA8DA', borderColor: '#4DA8DA' },
         icon: { color: '#4DA8DA' },
       },
-    } satisfies SearchProps['styles'];
+    };
   }
   return {};
 };
@@ -942,11 +1035,7 @@ const App: React.FC = () => {
   const classNames = styles;
   return (
     <Flex vertical gap="large">
-      <Input
-        classNames={{ root: classNames.focusEffect }}
-        placeholder="Object"
-        name="input-object"
-      />
+      <Input classNames={classNames} placeholder="Object" name="input-object" />
       <Input
         classNames={classNames}
         styles={stylesFn}

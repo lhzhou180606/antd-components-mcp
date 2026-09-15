@@ -213,6 +213,46 @@ const itemRender: PaginationProps['itemRender'] = (_, type, originalElement) => 
 const App: React.FC = () => <Pagination total={500} itemRender={itemRender} />;
 export default App;
 ```
+### 定制组件
+通过 `components` 替换每页条数切换器。
+
+```tsx
+import React from 'react';
+import type { PaginationProps } from 'antd';
+import { InputNumber, Pagination } from 'antd';
+type SizeChangerComponent = Required<NonNullable<PaginationProps['components']>>['sizeChanger'];
+type GetProps<T> = T extends React.ComponentType<infer P> ? P : never;
+const SizeChanger = (props: GetProps<SizeChangerComponent>) => {
+  const { disabled, value, onChange, className } = props;
+  return (
+    <InputNumber
+      aria-label="Page Size"
+      className={className}
+      disabled={disabled}
+      min={1}
+      precision={0}
+      style={{ width: 100 }}
+      value={value}
+      onChange={(nextValue) => {
+        if (nextValue !== null) {
+          onChange(nextValue);
+        }
+      }}
+    />
+  );
+};
+const App: React.FC = () => (
+  <Pagination
+    showSizeChanger
+    components={{
+      sizeChanger: SizeChanger,
+    }}
+    defaultCurrent={3}
+    total={500}
+  />
+);
+export default App;
+```
 ### 线框风格
 线框化样式。
 
@@ -281,13 +321,35 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 变体 Debug
+调试 `ConfigProvider` 的 `variant` 对快速跳转输入框的影响。
+
+```tsx
+import React from 'react';
+import { ConfigProvider, Flex, Pagination, Typography } from 'antd';
+const variants = ['outlined', 'filled', 'borderless', 'underlined'] as const;
+const App: React.FC = () => (
+  <Flex vertical gap="middle">
+    {variants.map((variant) => (
+      <ConfigProvider key={variant} variant={variant}>
+        <Flex vertical gap="small">
+          <Typography.Text code>{variant}</Typography.Text>
+          <Pagination defaultCurrent={2} total={50} showQuickJumper />
+          <Pagination defaultCurrent={2} total={50} simple />
+        </Flex>
+      </ConfigProvider>
+    ))}
+  </Flex>
+);
+export default App;
+```
 ### 自定义语义结构的样式和类
 通过 `classNames` 和 `styles` 传入对象/函数可以自定义 Pagination 的[语义化结构](#semantic-dom)样式。
 
 ```tsx
 import React from 'react';
 import { Flex, Pagination } from 'antd';
-import type { PaginationProps } from 'antd';
+import type { GetProp, PaginationProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -295,14 +357,16 @@ const classNames = createStaticStyles(({ css }) => ({
     padding: 8px;
   `,
 }));
-const styleFn: PaginationProps['styles'] = ({ props }) => {
+const styleFn: PaginationProps['styles'] = ({
+  props,
+}): GetProp<PaginationProps, 'styles', 'Return'> => {
   if (props.size === 'small') {
     return {
       item: {
         backgroundColor: `rgba(200, 200, 200, 0.3)`,
         marginInlineEnd: 4,
       },
-    } satisfies PaginationProps['styles'];
+    };
   }
   return {};
 };
