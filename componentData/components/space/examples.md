@@ -88,39 +88,59 @@ export default App;
 
 ```tsx
 import React from 'react';
-import { Button, Space } from 'antd';
-const App: React.FC = () => (
-  <div className="space-align-container">
-    <div className="space-align-block">
-      <Space align="center">
-        center
-        <Button type="primary">Primary</Button>
-        <span className="mock-block">Block</span>
-      </Space>
-    </div>
-    <div className="space-align-block">
-      <Space align="start">
-        start
-        <Button type="primary">Primary</Button>
-        <span className="mock-block">Block</span>
-      </Space>
-    </div>
-    <div className="space-align-block">
-      <Space align="end">
-        end
-        <Button type="primary">Primary</Button>
-        <span className="mock-block">Block</span>
-      </Space>
-    </div>
-    <div className="space-align-block">
-      <Space align="baseline">
-        baseline
-        <Button type="primary">Primary</Button>
-        <span className="mock-block">Block</span>
-      </Space>
-    </div>
-  </div>
-);
+import { Button, Flex, Space } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, cssVar } = props;
+  return {
+    spaceAlignBox: css`
+      flex: none;
+      margin: ${cssVar.marginXXS};
+      padding: ${cssVar.paddingXXS};
+      border: ${cssVar.lineWidth} ${cssVar.lineType} ${cssVar.blue};
+    `,
+    mockBox: css`
+      display: inline-block;
+      padding: ${cssVar.paddingXL} ${cssVar.padding};
+      background-color: rgba(150, 150, 150, 0.2);
+    `,
+  };
+});
+const App: React.FC = () => {
+  const { styles } = useStyles();
+  return (
+    <Flex wrap align="flex-start">
+      <div className={styles.spaceAlignBox}>
+        <Space align="center">
+          center
+          <Button type="primary">Primary</Button>
+          <span className={styles.mockBox}>Block</span>
+        </Space>
+      </div>
+      <div className={styles.spaceAlignBox}>
+        <Space align="start">
+          start
+          <Button type="primary">Primary</Button>
+          <span className={styles.mockBox}>Block</span>
+        </Space>
+      </div>
+      <div className={styles.spaceAlignBox}>
+        <Space align="end">
+          end
+          <Button type="primary">Primary</Button>
+          <span className={styles.mockBox}>Block</span>
+        </Space>
+      </div>
+      <div className={styles.spaceAlignBox}>
+        <Space align="baseline">
+          baseline
+          <Button type="primary">Primary</Button>
+          <span className={styles.mockBox}>Block</span>
+        </Space>
+      </div>
+    </Flex>
+  );
+};
 export default App;
 ```
 ### 自动换行
@@ -245,7 +265,7 @@ const App: React.FC = () => (
     <Space.Compact block>
       <DatePicker.RangePicker style={{ width: '70%' }} />
       <Input style={{ width: '30%' }} defaultValue="input content" />
-      <Button type="primary">查询</Button>
+      <Button type="primary">Search</Button>
     </Space.Compact>
     <Space.Compact block>
       <Input style={{ width: '30%' }} defaultValue="input content" />
@@ -573,7 +593,7 @@ import {
 const selectBefore = (
   <Select
     defaultValue="http"
-    className="select-before"
+    style={{ width: 90 }}
     options={[
       { label: 'http://', value: 'http' },
       { label: 'https://', value: 'https' },
@@ -583,7 +603,7 @@ const selectBefore = (
 const selectAfter = (
   <Select
     defaultValue=".com"
-    className="select-after"
+    style={{ width: 90 }}
     options={[
       { label: '.com', value: '.com' },
       { label: '.jp', value: '.jp' },
@@ -965,21 +985,23 @@ export default App;
 ```tsx
 import * as React from 'react';
 import { Button, Space } from 'antd';
-import type { SpaceProps } from 'antd';
+import type { GetProp, SpaceProps } from 'antd';
 const classNamesObject: SpaceProps['classNames'] = {
   root: 'demo-space-root',
   item: 'demo-space-item',
   separator: 'demo-space-separator',
 };
-const classNamesFn: SpaceProps['classNames'] = (info) => {
+const classNamesFn: SpaceProps['classNames'] = (
+  info,
+): GetProp<SpaceProps, 'classNames', 'Return'> => {
   if (info.props.orientation === 'vertical') {
     return {
       root: 'demo-space-root--vertical',
-    } satisfies SpaceProps['classNames'];
+    };
   } else {
     return {
       root: 'demo-space-root--horizontal',
-    } satisfies SpaceProps['classNames'];
+    };
   }
 };
 const stylesObject: SpaceProps['styles'] = {
@@ -987,7 +1009,7 @@ const stylesObject: SpaceProps['styles'] = {
   item: { backgroundColor: '#f0f0f0', padding: 4 },
   separator: { color: 'red', fontWeight: 'bold' },
 };
-const stylesFn: SpaceProps['styles'] = (info) => {
+const stylesFn: SpaceProps['styles'] = (info): GetProp<SpaceProps, 'styles', 'Return'> => {
   if (info.props.size === 'large') {
     return {
       root: {
@@ -995,14 +1017,14 @@ const stylesFn: SpaceProps['styles'] = (info) => {
         borderColor: '#1890ff',
         padding: 8,
       },
-    } satisfies SpaceProps['styles'];
+    };
   } else {
     return {
       root: {
         backgroundColor: '#fff7e6',
         borderColor: '#fa8c16',
       },
-    } satisfies SpaceProps['styles'];
+    };
   }
 };
 const App: React.FC = () => {
@@ -1021,5 +1043,27 @@ const App: React.FC = () => {
     </div>
   );
 };
+export default App;
+```
+### 自定义主题
+使用 `ConfigProvider` 自定义 `Space.Addon` 的主题样式。
+
+```tsx
+import React from 'react';
+import { Button, ConfigProvider, Space } from 'antd';
+const App: React.FC = () => (
+  <ConfigProvider
+    theme={{
+      components: {
+        Addon: { colorText: 'blue', algorithm: true },
+      },
+    }}
+  >
+    <Space.Compact>
+      <Space.Addon>Addon</Space.Addon>
+      <Button type="primary">Button</Button>
+    </Space.Compact>
+  </ConfigProvider>
+);
 export default App;
 ```

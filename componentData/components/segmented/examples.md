@@ -51,7 +51,8 @@ export default Demo;
 import React, { useState } from 'react';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { Flex, Segmented } from 'antd';
-import type { SizeType } from '../../config-provider/SizeContext';
+import type { SegmentedProps } from 'antd';
+type SizeType = NonNullable<SegmentedProps['size']>;
 const Demo: React.FC = () => {
   const [size, setSize] = useState<SizeType>('medium');
   return (
@@ -124,7 +125,7 @@ const App: React.FC = () => (
         {
           label: (
             <div style={{ padding: 4 }}>
-              <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" alt="User 1" />
+              <Avatar src="https://api.dicebear.com/10.x/lorelei/svg?seed=8" alt="User 1" />
               <div>User 1</div>
             </div>
           ),
@@ -239,17 +240,34 @@ const App: React.FC = () => (
 export default App;
 ```
 ### 设置图标
-给 Segmented Item 设置 Icon。
+给 Segmented Item 设置 Icon。`icon` 也支持第三方图标库的裸 `<svg>` 元素，会自动与文字居中对齐。
 
 ```tsx
 import React from 'react';
 import { AppstoreOutlined, BarsOutlined } from '@ant-design/icons';
 import { Segmented } from 'antd';
+// Icons from third-party libraries (e.g. lucide, react-icons) render as a bare `<svg>`
+// rather than an `.anticon` wrapper. It stays vertically centred with the label.
+const CalendarIcon: React.FC = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="1em"
+    height="1em"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    aria-hidden="true"
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <path d="M16 2v4M8 2v4M3 10h18" />
+  </svg>
+);
 const Demo: React.FC = () => (
   <Segmented
     options={[
       { label: 'List', value: 'List', icon: <BarsOutlined /> },
       { label: 'Kanban', value: 'Kanban', icon: <AppstoreOutlined /> },
+      { label: 'Calendar', value: 'Calendar', icon: <CalendarIcon /> },
     ]}
   />
 );
@@ -290,14 +308,14 @@ export default Demo;
 import React from 'react';
 import { CloudOutlined, RocketOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Flex, Segmented } from 'antd';
-import type { SegmentedProps } from 'antd';
+import type { GetProp, SegmentedProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
     padding: 2px;
   `,
 }));
-const styleFn: SegmentedProps['styles'] = (info) => {
+const styleFn: SegmentedProps['styles'] = (info): GetProp<SegmentedProps, 'styles', 'Return'> => {
   if (info.props.vertical) {
     return {
       root: {
@@ -311,7 +329,7 @@ const styleFn: SegmentedProps['styles'] = (info) => {
       item: {
         textAlign: 'start',
       },
-    } satisfies SegmentedProps['styles'];
+    };
   }
   return {};
 };
