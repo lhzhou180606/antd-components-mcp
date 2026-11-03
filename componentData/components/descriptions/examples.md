@@ -131,30 +131,30 @@ interface DataType {
 const dataSource: DataType[] = [
   {
     key: '1',
-    name: '胡彦斌',
+    name: 'John Brown',
     age: 32,
-    address: '西湖区湖底公园1号',
+    address: 'No. 1 Lake Park',
   },
   {
     key: '2',
-    name: '胡彦祖',
+    name: 'Jim Green',
     age: 42,
-    address: '西湖区湖底公园1号',
+    address: 'No. 1 Lake Park',
   },
 ];
 const columns: TableProps<DataType>['columns'] = [
   {
-    title: '姓名',
+    title: 'Name',
     dataIndex: 'name',
     key: 'name',
   },
   {
-    title: '年龄',
+    title: 'Age',
     dataIndex: 'age',
     key: 'age',
   },
   {
-    title: '住址',
+    title: 'Address',
     dataIndex: 'address',
     key: 'address',
   },
@@ -696,7 +696,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Descriptions, Flex } from 'antd';
-import type { DescriptionsProps } from 'antd';
+import type { DescriptionsProps, GetProp } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -725,7 +725,9 @@ const styles: DescriptionsProps['styles'] = {
     color: '#000',
   },
 };
-const stylesFn: DescriptionsProps['styles'] = (info) => {
+const stylesFn: DescriptionsProps['styles'] = (
+  info,
+): GetProp<DescriptionsProps, 'styles', 'Return'> => {
   if (info.props.size === 'large') {
     return {
       root: {
@@ -733,7 +735,7 @@ const stylesFn: DescriptionsProps['styles'] = (info) => {
         border: '1px solid #CDC1FF',
       },
       label: { color: '#A294F9' },
-    } satisfies DescriptionsProps['styles'];
+    };
   }
   return {};
 };

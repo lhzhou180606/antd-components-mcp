@@ -245,10 +245,10 @@ const Block = React.forwardRef<HTMLDivElement, Partial<TooltipProps>>((props, re
       }}
     >
       <Tooltip {...props} placement="left" title="Prompt Text">
-        <Button>Adjust automatically / 自动调整</Button>
+        <Button>Adjust automatically</Button>
       </Tooltip>
       <Tooltip {...props} placement="left" title="Prompt Text" autoAdjustOverflow={false}>
-        <Button>Ignore / 不处理</Button>
+        <Button>Ignore</Button>
       </Tooltip>
     </div>
   </div>
@@ -266,6 +266,36 @@ const App: React.FC = () => {
       <Block ref={containerRef1} getPopupContainer={(trigger) => trigger.parentElement!} />
       <Typography.Title level={5}>Without `getPopupContainer`</Typography.Title>
       <Block ref={containerRef2} />
+    </div>
+  );
+};
+export default App;
+```
+### 布局变化后重新对齐
+```tsx
+import React from 'react';
+import type { TooltipRef } from 'antd';
+import { Button, Tooltip } from 'antd';
+const App: React.FC = () => {
+  const [loaded, setLoaded] = React.useState(false);
+  const tooltipRef = React.useRef<TooltipRef>(null);
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setLoaded(true);
+    }, 2000);
+    return () => window.clearTimeout(timer);
+  }, []);
+  React.useLayoutEffect(() => {
+    if (loaded) {
+      tooltipRef.current?.forceAlign();
+    }
+  }, [loaded]);
+  return (
+    <div style={{ minHeight: 160, paddingTop: 16 }}>
+      {loaded && <div style={{ height: 80, marginBottom: 16 }}>Async content loaded.</div>}
+      <Tooltip ref={tooltipRef} title="Tooltip stays aligned" open placement="top">
+        <Button>Trigger</Button>
+      </Tooltip>
     </div>
   );
 };
@@ -444,7 +474,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Button, Flex, Tooltip } from 'antd';
-import type { TooltipProps } from 'antd';
+import type { GetProp, TooltipProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   container: css`
@@ -457,7 +487,7 @@ const styles: TooltipProps['styles'] = {
     boxShadow: 'inset 0 0 8px #ccc',
   },
 };
-const stylesFn: TooltipProps['styles'] = (info) => {
+const stylesFn: TooltipProps['styles'] = (info): GetProp<TooltipProps, 'styles', 'Return'> => {
   if (!info.props.arrow) {
     return {
       container: {
@@ -466,7 +496,7 @@ const stylesFn: TooltipProps['styles'] = (info) => {
         color: '#fff',
         borderRadius: 4,
       },
-    } satisfies TooltipProps['styles'];
+    };
   }
   return {};
 };

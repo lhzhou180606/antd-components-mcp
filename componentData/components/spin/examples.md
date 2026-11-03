@@ -176,7 +176,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Spin } from 'antd';
-import type { SpinProps } from 'antd';
+import type { GetProp, SpinProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -188,13 +188,13 @@ const stylesObject: SpinProps['styles'] = {
     color: '#00d4ff',
   },
 };
-const stylesFn: SpinProps['styles'] = ({ props }) => {
+const stylesFn: SpinProps['styles'] = ({ props }): GetProp<SpinProps, 'styles', 'Return'> => {
   if (props.size === 'small') {
     return {
       indicator: {
         color: '#722ed1',
       },
-    } satisfies SpinProps['styles'];
+    };
   }
   return {};
 };
@@ -242,5 +242,25 @@ const App: React.FC = () => {
     </>
   );
 };
+export default App;
+```
+### List 嵌套调试
+在非加载状态的 Spin 容器（如 List）中嵌套独立 Spin 的调试示例。
+
+```tsx
+import React from 'react';
+import { Flex, Spin } from 'antd';
+const App: React.FC = () => (
+  <Spin spinning={false}>
+    <Flex vertical gap="small">
+      {['Apple', 'Banana'].map((item) => (
+        <Flex key={item} justify="space-between" align="center">
+          {item}
+          <Spin size="small" />
+        </Flex>
+      ))}
+    </Flex>
+  </Spin>
+);
 export default App;
 ```
