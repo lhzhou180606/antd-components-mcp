@@ -48,7 +48,6 @@ import {
   Cascader,
   ConfigProvider,
   Divider,
-  List,
   Select,
   Space,
   Switch,
@@ -92,8 +91,6 @@ const App: React.FC = () => {
               { title: 'Age', dataIndex: 'age', key: 'age' },
             ]}
           />
-          <h4>List</h4>
-          <List />
         </Space>
       </ConfigProvider>
     </>
@@ -106,9 +103,9 @@ export default App;
 
 ```tsx
 import React from 'react';
+import type { EmptyProps, GetProp } from 'antd';
 import { Button, Empty, Flex } from 'antd';
 import { createStaticStyles } from 'antd-style';
-import type { EmptyProps } from '..';
 const emptySharedProps: EmptyProps = {
   image: Empty.PRESENTED_IMAGE_SIMPLE,
   children: <Button type="primary">Create Now</Button>,
@@ -122,16 +119,16 @@ const classNames = createStaticStyles(({ css }) => ({
 const stylesObject: EmptyProps['styles'] = {
   root: { backgroundColor: '#f5f5f5', borderRadius: '8px' },
   image: { filter: 'grayscale(100%)' },
-  description: { color: '#1890ff', fontWeight: 'bold' },
+  description: { color: '#1890ff', fontWeight: 700 },
   footer: { marginTop: '16px' },
 };
-const stylesFn: EmptyProps['styles'] = ({ props }) => {
+const stylesFn: EmptyProps['styles'] = ({ props }): GetProp<EmptyProps, 'styles', 'Return'> => {
   if (props.description) {
     return {
       root: { backgroundColor: '#e6f7ff', border: '1px solid #91d5ff' },
-      description: { color: '#1890ff', fontWeight: 'bold' },
+      description: { color: '#1890ff', fontWeight: 700 },
       image: { filter: 'hue-rotate(180deg)' },
-    } satisfies EmptyProps['styles'];
+    };
   }
   return {};
 };
