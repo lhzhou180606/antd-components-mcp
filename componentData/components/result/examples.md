@@ -112,41 +112,49 @@ export default App;
 import React from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Button, Result, Typography } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, cssVar } = props;
+  return {
+    errorIcon: css`
+      color: ${cssVar.colorError};
+      margin-inline-end: ${cssVar.marginXS};
+    `,
+  };
+});
 const { Paragraph, Text } = Typography;
-const App: React.FC = () => (
-  <Result
-    status="error"
-    title="Submission Failed"
-    subTitle="Please check and modify the following information before resubmitting."
-    extra={[
-      <Button type="primary" key="console">
-        Go Console
-      </Button>,
-      <Button key="buy">Buy Again</Button>,
-    ]}
-  >
-    <div className="desc">
-      <Paragraph>
-        <Text
-          strong
-          style={{
-            fontSize: 16,
-          }}
-        >
-          The content you submitted has the following error:
-        </Text>
-      </Paragraph>
-      <Paragraph>
-        <CloseCircleOutlined className="site-result-demo-error-icon" /> Your account has been
-        frozen. <a>Thaw immediately &gt;</a>
-      </Paragraph>
-      <Paragraph>
-        <CloseCircleOutlined className="site-result-demo-error-icon" /> Your account is not yet
-        eligible to apply. <a>Apply Unlock &gt;</a>
-      </Paragraph>
-    </div>
-  </Result>
-);
+const App: React.FC = () => {
+  const { styles } = useStyles();
+  return (
+    <Result
+      status="error"
+      title="Submission Failed"
+      subTitle="Please check and modify the following information before resubmitting."
+      extra={[
+        <Button type="primary" key="console">
+          Go Console
+        </Button>,
+        <Button key="buy">Buy Again</Button>,
+      ]}
+    >
+      <div className="desc">
+        <Paragraph>
+          <Text strong style={{ fontSize: 16 }}>
+            The content you submitted has the following error:
+          </Text>
+        </Paragraph>
+        <Paragraph>
+          <CloseCircleOutlined className={styles.errorIcon} />
+          Your account has been frozen. <a>Thaw immediately &gt;</a>
+        </Paragraph>
+        <Paragraph>
+          <CloseCircleOutlined className={styles.errorIcon} />
+          Your account is not yet eligible to apply. <a>Apply Unlock &gt;</a>
+        </Paragraph>
+      </div>
+    </Result>
+  );
+};
 export default App;
 ```
 ### 自定义 icon
@@ -171,7 +179,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Button, Result } from 'antd';
-import type { ResultProps } from 'antd';
+import type { GetProp, ResultProps } from 'antd';
 const classNamesObject: ResultProps['classNames'] = {
   root: 'demo-result-root',
   title: 'demo-result-title',
@@ -180,35 +188,37 @@ const classNamesObject: ResultProps['classNames'] = {
   extra: 'demo-result-extra',
   body: 'demo-result-body',
 };
-const classNamesFn: ResultProps['classNames'] = (info) => {
+const classNamesFn: ResultProps['classNames'] = (
+  info,
+): GetProp<ResultProps, 'classNames', 'Return'> => {
   if (info.props.status === 'success') {
     return {
       root: 'demo-result-root--success',
-    } satisfies ResultProps['classNames'];
+    };
   }
   return {
     root: 'demo-result-root--default',
-  } satisfies ResultProps['classNames'];
+  };
 };
 const stylesObject: ResultProps['styles'] = {
   root: { borderWidth: 2, borderStyle: 'dashed', padding: 16 },
   title: { fontStyle: 'italic', color: '#1890ff' },
-  subTitle: { fontWeight: 'bold' },
+  subTitle: { fontWeight: 700 },
   icon: { opacity: 0.8 },
   extra: { backgroundColor: '#f0f0f0', padding: 8 },
   body: { backgroundColor: '#fafafa', padding: 12 },
 };
-const stylesFn: ResultProps['styles'] = (info) => {
+const stylesFn: ResultProps['styles'] = (info): GetProp<ResultProps, 'styles', 'Return'> => {
   if (info.props.status === 'error') {
     return {
       root: { backgroundColor: '#fff2f0', borderColor: '#ff4d4f' },
       title: { color: '#ff4d4f' },
-    } satisfies ResultProps['styles'];
+    };
   } else {
     return {
       root: { backgroundColor: '#f6ffed', borderColor: '#52c41a' },
       title: { color: '#52c41a' },
-    } satisfies ResultProps['styles'];
+    };
   }
 };
 const App: React.FC = () => {

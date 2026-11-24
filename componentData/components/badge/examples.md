@@ -33,7 +33,7 @@ const App: React.FC = () => {
   const [show, setShow] = useState(true);
   return (
     <Space>
-      <Switch checked={show} onChange={() => setShow(!show)} />
+      <Switch aria-label="Show badge counts" checked={show} onChange={() => setShow(!show)} />
       <Badge count={show ? 11 : 0} showZero color="#faad14" />
       <Badge count={show ? 25 : 0} />
       <Badge count={show ? <ClockCircleOutlined style={{ color: '#f5222d' }} /> : 0} />
@@ -133,7 +133,7 @@ const App: React.FC = () => {
         <Badge dot={show}>
           <Avatar shape="square" size="large" />
         </Badge>
-        <Switch onChange={onChange} checked={show} />
+        <Switch aria-label="Show badge dot" onChange={onChange} checked={show} />
       </Space>
     </Space>
   );
@@ -311,12 +311,12 @@ export default App;
 ```tsx
 import React from 'react';
 import { Avatar, Badge, Card, Flex, Space } from 'antd';
-import type { BadgeProps } from 'antd';
+import type { BadgeProps, GetProp, GetProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
-import type { RibbonProps } from 'antd/es/badge/Ribbon';
+type RibbonProps = GetProps<typeof Badge.Ribbon>;
 const badgeClassNames = createStaticStyles(({ css }) => ({
   indicator: css`
-   font-size: 10px;
+    font-size: 10px;
   `,
 }));
 const ribbonClassNames = createStaticStyles(({ css }) => ({
@@ -336,27 +336,27 @@ const ribbonStyles: RibbonProps['styles'] = {
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
 };
-const badgeStylesFn: BadgeProps['styles'] = (info) => {
+const badgeStylesFn: BadgeProps['styles'] = (info): GetProp<RibbonProps, 'styles', 'Return'> => {
   if (info.props.size === 'medium') {
     return {
       indicator: {
         fontSize: 14,
         backgroundColor: '#696FC7',
       },
-    } satisfies BadgeProps['styles'];
+    };
   }
   return {};
 };
-const ribbonStylesFn: RibbonProps['styles'] = (info) => {
+const ribbonStylesFn: RibbonProps['styles'] = (info): GetProp<RibbonProps, 'styles', 'Return'> => {
   if (info.props.color === '#696FC7') {
     return {
       content: {
-        fontWeight: 'bold',
+        fontWeight: 700,
       },
       indicator: {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       },
-    } satisfies RibbonProps['styles'];
+    };
   }
   return {};
 };
@@ -563,6 +563,7 @@ export default () => (
           dotSize: 4,
           textFontWeight: 'bold',
           statusSize: 8,
+          paddingInline: 12,
         },
       },
     }}

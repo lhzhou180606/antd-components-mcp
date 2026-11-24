@@ -77,7 +77,7 @@ const App: React.FC = () => (
     renderItem={(item, index) => (
       <List.Item>
         <List.Item.Meta
-          avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+          avatar={<Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />}
           title={<a href="https://ant.design">{item.title}</a>}
           description="Ant Design, a design language for background applications, is refined by Ant UED Team"
         />
@@ -93,6 +93,15 @@ export default App;
 ```tsx
 import React, { useEffect, useState } from 'react';
 import { Avatar, Button, List, Skeleton } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css } = props;
+  return {
+    loadmoreList: css`
+      min-height: 350px;
+    `,
+  };
+});
 interface DataType {
   gender?: string;
   name?: string;
@@ -102,6 +111,7 @@ interface DataType {
 }
 const PAGE_SIZE = 3;
 const App: React.FC = () => {
+  const { styles } = useStyles();
   const [initLoading, setInitLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<DataType[]>([]);
@@ -124,7 +134,7 @@ const App: React.FC = () => {
       setList(results);
     });
   }, []);
-  const onLoadMore = () => {
+  const onLoadMore: React.MouseEventHandler<HTMLElement> = () => {
     setLoading(true);
     setList(data.concat(Array.from({ length: PAGE_SIZE }).map(() => ({ loading: true }))));
     const nextPage = page + 1;
@@ -143,28 +153,19 @@ const App: React.FC = () => {
   };
   const loadMore =
     !initLoading && !loading ? (
-      <div
-        style={{
-          textAlign: 'center',
-          marginTop: 12,
-          height: 32,
-          lineHeight: '32px',
-        }}
-      >
+      <div style={{ textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px' }}>
         <Button onClick={onLoadMore}>loading more</Button>
       </div>
     ) : null;
   return (
     <List
-      className="demo-loadmore-list"
+      className={styles.loadmoreList}
       loading={initLoading}
       itemLayout="horizontal"
       loadMore={loadMore}
       dataSource={list}
       renderItem={(item) => (
-        <List.Item
-          actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
-        >
+        <List.Item actions={[<a key="loadmore-edit">edit</a>, <a key="loadmore-more">more</a>]}>
           <Skeleton avatar title={false} loading={item.loading} active>
             <List.Item.Meta
               avatar={<Avatar src={item.avatar} />}
@@ -190,7 +191,7 @@ import { Avatar, List, Space } from 'antd';
 const data = Array.from({ length: 23 }).map((_, i) => ({
   href: 'https://ant.design',
   title: `ant design part ${i}`,
-  avatar: `https://api.dicebear.com/7.x/miniavs/svg?seed=${i}`,
+  avatar: `https://api.dicebear.com/10.x/lorelei/svg?seed=${i}`,
   description:
     'Ant Design, a design language for background applications, is refined by Ant UED Team.',
   content:
@@ -316,7 +317,7 @@ const App: React.FC = () => {
         renderItem={(item, index) => (
           <List.Item>
             <List.Item.Meta
-              avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+              avatar={<Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />}
               title={<a href="https://ant.design">{item.title}</a>}
               description="Ant Design, a design language for background applications, is refined by Ant UED Team"
             />
@@ -930,6 +931,7 @@ interface UserItem {
 const CONTAINER_HEIGHT = 400;
 const PAGE_SIZE = 20;
 const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState<UserItem[]>([]);
   const [page, setPage] = useState(1);
   const appendData = (showMessage = true) => {
@@ -940,7 +942,7 @@ const App: React.FC = () => {
         const results = Array.isArray(body) ? body : [];
         setData(data.concat(results));
         setPage(page + 1);
-        showMessage && message.success(`${results.length} more items loaded!`);
+        showMessage && messageApi.success(`${results.length} more items loaded!`);
       })
       .catch(() => {
         console.log('fetch mock data failed');
@@ -958,26 +960,29 @@ const App: React.FC = () => {
     }
   };
   return (
-    <List>
-      <VirtualList
-        data={data}
-        height={CONTAINER_HEIGHT}
-        itemHeight={47}
-        itemKey="email"
-        onScroll={onScroll}
-      >
-        {(item: UserItem) => (
-          <List.Item key={item.email}>
-            <List.Item.Meta
-              avatar={<Avatar src={item.avatar} />}
-              title={<a href="https://ant.design">{item.name}</a>}
-              description={item.email}
-            />
-            <div>Content</div>
-          </List.Item>
-        )}
-      </VirtualList>
-    </List>
+    <>
+      {contextHolder}
+      <List>
+        <VirtualList
+          data={data}
+          height={CONTAINER_HEIGHT}
+          itemHeight={47}
+          itemKey="email"
+          onScroll={onScroll}
+        >
+          {(item: UserItem) => (
+            <List.Item key={item.email}>
+              <List.Item.Meta
+                avatar={<Avatar src={item.avatar} />}
+                title={<a href="https://ant.design">{item.name}</a>}
+                description={item.email}
+              />
+              <div>Content</div>
+            </List.Item>
+          )}
+        </VirtualList>
+      </List>
+    </>
   );
 };
 export default App;
@@ -1065,7 +1070,7 @@ const App: React.FC = () => (
       renderItem={(item, index) => (
         <List.Item>
           <List.Item.Meta
-            avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+            avatar={<Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />}
             title={<a href="https://ant.design">{item.title}</a>}
             description="Ant Design, a design language for background applications, is refined by Ant UED Team"
           />
@@ -1079,7 +1084,7 @@ const App: React.FC = () => (
       renderItem={(item, index) => (
         <List.Item>
           <List.Item.Meta
-            avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+            avatar={<Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />}
             title={<a href="https://ant.design">{item.title}</a>}
             description="Ant Design, a design language for background applications, is refined by Ant UED Team"
           />
@@ -1119,7 +1124,7 @@ const App: React.FC = () => (
       renderItem={(item, index) => (
         <List.Item>
           <List.Item.Meta
-            avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
+            avatar={<Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />}
             title={<a href="https://ant.design">{item.title}</a>}
             description="Ant Design, a design language for background applications, is refined by Ant UED Team"
           />

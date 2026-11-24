@@ -112,6 +112,21 @@ const App: React.FC = () => {
 };
 export default App;
 ```
+### 带移除图标
+点击清除图标清空数值，`onChange` 接收 `null`。支持自定义清除图标，值为 `0` 时也可以清空。
+
+```tsx
+import React from 'react';
+import { InputNumber, Space } from 'antd';
+const App: React.FC = () => (
+  <Space vertical>
+    <InputNumber allowClear defaultValue={100} style={{ width: 120 }} />
+    <InputNumber allowClear defaultValue={0} suffix="kg" style={{ width: 120 }} />
+    <InputNumber allowClear mode="spinner" defaultValue={0} style={{ width: 150 }} />
+  </Space>
+);
+export default App;
+```
 ### 高精度小数
 通过 `stringMode` 开启高精度小数支持，`onChange` 事件将返回 string 类型。对于旧版浏览器，你需要 BigInt polyfill。
 
@@ -258,6 +273,49 @@ const App: React.FC = () => (
   <Flex vertical gap="medium">
     <InputNumber {...sharedProps} placeholder="Outlined" />
     <InputNumber {...sharedProps} variant="filled" placeholder="Filled" />
+  </Flex>
+);
+export default App;
+```
+### 禁用步进按钮 hover
+禁用步进按钮 hover 排查。
+
+```tsx
+import React from 'react';
+import { Flex, InputNumber, Typography } from 'antd';
+const sharedProps = {
+  min: 0,
+  max: 3,
+  controls: true,
+  style: { width: 180 },
+};
+const App: React.FC = () => (
+  <Flex vertical gap={16}>
+    <Typography.Text type="secondary">
+      Hover the disabled step controls when the value reaches min or max.
+    </Typography.Text>
+    <Flex gap={16} wrap>
+      <Flex vertical gap={8}>
+        <Typography.Text>Input mode at max</Typography.Text>
+        <InputNumber {...sharedProps} defaultValue={3} />
+      </Flex>
+      <Flex vertical gap={8}>
+        <Typography.Text>Input mode at min</Typography.Text>
+        <InputNumber {...sharedProps} defaultValue={0} />
+      </Flex>
+      <Flex vertical gap={8}>
+        <Typography.Text>Spinner mode at max</Typography.Text>
+        <InputNumber {...sharedProps} defaultValue={3} mode="spinner" />
+      </Flex>
+      <Flex vertical gap={8}>
+        <Typography.Text>Spinner mode at min</Typography.Text>
+        <InputNumber {...sharedProps} defaultValue={0} mode="spinner" />
+      </Flex>
+      <Flex vertical gap={8}>
+        <Typography.Text>Spinner mode with prefix and suffix</Typography.Text>
+        <InputNumber {...sharedProps} defaultValue={1} mode="spinner" prefix="$" suffix="USD" />
+      </Flex>
+    </Flex>
   </Flex>
 );
 export default App;
@@ -477,12 +535,12 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, InputNumber } from 'antd';
-import type { InputNumberProps } from 'antd';
+import type { GetProp, InputNumberProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyle = createStyles(({ token }) => ({
   root: {
-    border: `1px solid ${token.colorPrimary}`,
-    borderRadius: 8,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorPrimary}`,
+    borderRadius: token.borderRadiusLG,
     width: 200,
   },
 }));
@@ -491,14 +549,16 @@ const stylesObject: InputNumberProps['styles'] = {
     fontSize: 14,
   },
 };
-const stylesFn: InputNumberProps['styles'] = ({ props }) => {
+const stylesFn: InputNumberProps['styles'] = ({
+  props,
+}): GetProp<InputNumberProps, 'styles', 'Return'> => {
   if (props.size === 'large') {
     return {
       root: {
         backgroundColor: 'rgba(250,250,250, 0.5)',
         borderColor: '#722ed1',
       },
-    } satisfies InputNumberProps['styles'];
+    };
   }
   return {};
 };

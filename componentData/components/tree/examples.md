@@ -170,7 +170,7 @@ const generateData = (_level: number, _preKey?: React.Key, _tns?: TreeDataNode[]
   const level = _level - 1;
   children.forEach((key, index) => {
     tns[index].children = [];
-    return generateData(level, key, tns[index].children);
+    generateData(level, key, tns[index].children);
   });
 };
 generateData(z);
@@ -332,7 +332,7 @@ const generateData = (_level: number, _preKey?: React.Key, _tns?: TreeDataNode[]
   const level = _level - 1;
   children.forEach((key, index) => {
     tns[index].children = [];
-    return generateData(level, key, tns[index].children);
+    generateData(level, key, tns[index].children);
   });
 };
 generateData(z);
@@ -395,7 +395,7 @@ const App: React.FC = () => {
           index > -1 ? (
             <span key={item.key}>
               {beforeStr}
-              <span className="site-tree-search-value">{searchValue}</span>
+              <span style={{ color: '#f50' }}>{searchValue}</span>
               {afterStr}
             </span>
           ) : (
@@ -516,14 +516,16 @@ const App: React.FC = () => {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        showLine: <Switch checked={!!showLine} onChange={setShowLine} />
+        showLine:{' '}
+        <Switch aria-label="Show connecting lines" checked={!!showLine} onChange={setShowLine} />
         <br />
         <br />
-        showIcon: <Switch checked={showIcon} onChange={setShowIcon} />
+        showIcon: <Switch aria-label="Show node icons" checked={showIcon} onChange={setShowIcon} />
         <br />
         <br />
         showLeafIcon:{' '}
         <Select
+          aria-label="Leaf icon"
           defaultValue="true"
           onChange={handleLeafIconChange}
           options={[
@@ -761,7 +763,11 @@ const App: React.FC = () => {
   return (
     <Tree
       showLine
-      switcherIcon={<DownOutlined />}
+      switcherIcon={({ expanded }) => (
+        <DownOutlined
+          style={{ transform: `rotate(${expanded ? 0 : -90}deg)`, transition: 'transform 0.3s' }}
+        />
+      )}
       defaultExpandedKeys={['0-0-0']}
       onSelect={onSelect}
       treeData={treeData}
@@ -807,6 +813,43 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 滚动到嵌套节点
+受控模式可使用 `Tree.useTree` 获取节点路径并更新 `expandedKeys`，然后滚动到目标节点。
+
+```tsx
+import React, { useRef, useState } from 'react';
+import { Button, Flex, Tree } from 'antd';
+import type { GetRef, TreeDataNode } from 'antd';
+const TARGET_KEY = '0-1-1-1-1';
+const createTree = (key = '0', level = 1): TreeDataNode => ({
+  key,
+  title: key,
+  children: level < 5 ? [0, 1].map((index) => createTree(`${key}-${index}`, level + 1)) : undefined,
+});
+const treeData = [createTree()];
+const App: React.FC = () => {
+  const treeRef = useRef<GetRef<typeof Tree>>(null);
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const { getPath } = Tree.useTree(treeData, {});
+  const scrollTo = () => {
+    setExpandedKeys(getPath(TARGET_KEY).map(({ key }) => key));
+    treeRef.current?.scrollTo({ key: TARGET_KEY, align: 'top' });
+  };
+  return (
+    <Flex vertical gap="small">
+      <Button onClick={scrollTo}>scrollTo: {TARGET_KEY}</Button>
+      <Tree
+        ref={treeRef}
+        height={200}
+        treeData={treeData}
+        expandedKeys={expandedKeys}
+        onExpand={setExpandedKeys}
+      />
+    </Flex>
+  );
+};
+export default App;
+```
 ### Drag Debugundefined
 
 ```tsx
@@ -833,7 +876,7 @@ const generateData = (_level: number, preKey = '0', tns = data): TreeDataNode[] 
   const level = _level - 1;
   children.forEach((key, index) => {
     tns[index].children = [];
-    return generateData(level, key, tns[index].children);
+    generateData(level, key, tns[index].children);
   });
 };
 generateData(z);
@@ -1102,7 +1145,7 @@ const treeData: TreeDataNode[] = [
         ],
       },
       {
-        title: 'parent 1-1',
+        title: 'This is a very very very very long title',
         key: '0-0-1',
         children: [{ title: <span style={{ color: '#1677ff' }}>sss</span>, key: '0-0-1-0' }],
       },
@@ -1137,7 +1180,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Tree } from 'antd';
-import type { TreeProps } from 'antd';
+import type { GetProp, TreeProps } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const classNames = createStaticStyles(({ css }) => ({
   root: css`
@@ -1187,14 +1230,14 @@ const styles: TreeProps['styles'] = {
   root: { border: '2px solid #d9d9d9' },
   item: { margin: '2px 0' },
 };
-const stylesFn: TreeProps['styles'] = (info) => {
+const stylesFn: TreeProps['styles'] = (info): GetProp<TreeProps, 'styles', 'Return'> => {
   if (!info.props.checkable) {
     return {
       root: {
         border: `2px solid #E5D9F2`,
         borderRadius: 4,
       },
-    } satisfies TreeProps['styles'];
+    };
   }
   return {};
 };

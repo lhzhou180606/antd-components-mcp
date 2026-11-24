@@ -254,7 +254,7 @@ const App: React.FC = () => {
     padding: 48,
     overflow: 'hidden',
     background: token.colorFillAlter,
-    border: `1px solid ${token.colorBorderSecondary}`,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorBorderSecondary}`,
     borderRadius: token.borderRadiusLG,
   };
   return (
@@ -439,18 +439,55 @@ export default App;
 
 ```tsx
 import React, { useState } from 'react';
-import { Avatar, Col, Divider, Drawer, List, Row } from 'antd';
+import { Avatar, Col, Divider, Drawer, Flex, Listy, Row, Typography } from 'antd';
+import { createStyles } from 'antd-style';
+const useStyles = createStyles((props) => {
+  const { css, cssVar, prefixCls } = props;
+  return {
+    list: css`
+      border: ${cssVar.lineWidth} ${cssVar.lineType} ${cssVar.colorBorder};
+      border-radius: ${cssVar.borderRadiusLG};
+      overflow: hidden;
+      .${prefixCls}-listy-item:last-child {
+        border-bottom: none;
+      }
+    `,
+    descriptionItem: css`
+      margin-bottom: ${cssVar.marginXS};
+      color: ${cssVar.colorTextLabel};
+      font-size: ${cssVar.fontSize};
+      line-height: ${cssVar.lineHeight};
+    `,
+    profileTitle: css`
+      display: block;
+      margin-bottom: ${cssVar.margin};
+      color: ${cssVar.colorTextHeading};
+      font-size: ${cssVar.fontSizeLG};
+      line-height: ${cssVar.lineHeight};
+    `,
+    label: css`
+      display: inline-block;
+      margin-inline-end: ${cssVar.marginXS};
+      color: ${cssVar.colorTextHeading};
+    `,
+  };
+});
 interface DescriptionItemProps {
   title: string;
   content: React.ReactNode;
 }
-const DescriptionItem = ({ title, content }: DescriptionItemProps) => (
-  <div className="site-description-item-profile-wrapper">
-    <p className="site-description-item-profile-p-label">{title}:</p>
-    {content}
-  </div>
-);
+const DescriptionItem: React.FC<DescriptionItemProps> = (props) => {
+  const { title, content } = props;
+  const { styles } = useStyles();
+  return (
+    <div className={styles.descriptionItem}>
+      <p className={styles.label}>{title}:</p>
+      {content}
+    </div>
+  );
+};
 const App: React.FC = () => {
+  const { styles } = useStyles();
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);
@@ -460,42 +497,29 @@ const App: React.FC = () => {
   };
   return (
     <>
-      <List
-        dataSource={[
-          {
-            id: 1,
-            name: 'Lily',
-          },
-          {
-            id: 2,
-            name: 'Lily',
-          },
+      <Listy
+        items={[
+          { id: 1, name: 'Lily' },
+          { id: 2, name: 'Lily' },
         ]}
-        bordered
-        renderItem={(item) => (
-          <List.Item
-            key={item.id}
-            actions={[
-              <a onClick={showDrawer} key={`a-${item.id}`}>
-                View Profile
-              </a>,
-            ]}
-          >
-            <List.Item.Meta
-              avatar={
-                <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
-              }
-              title={<a href="https://ant.design/index-cn">{item.name}</a>}
-              description="Progresser XTech"
-            />
-          </List.Item>
+        rowKey="id"
+        className={styles.list}
+        itemRender={(item) => (
+          <Flex gap="middle" align="center">
+            <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
+            <Flex vertical flex="auto">
+              <a href="https://ant.design/index-cn">{item.name}</a>
+              <Typography.Text type="secondary">Progresser XTech</Typography.Text>
+            </Flex>
+            <a onClick={showDrawer}>View Profile</a>
+          </Flex>
         )}
       />
       <Drawer size={640} placement="right" closable={false} onClose={onClose} open={open}>
-        <p className="site-description-item-profile-p" style={{ marginBottom: 24 }}>
+        <p className={styles.profileTitle} style={{ marginBottom: 24 }}>
           User Profile
         </p>
-        <p className="site-description-item-profile-p">Personal</p>
+        <p className={styles.profileTitle}>Personal</p>
         <Row>
           <Col span={12}>
             <DescriptionItem title="Full Name" content="Lily" />
@@ -529,7 +553,7 @@ const App: React.FC = () => {
           </Col>
         </Row>
         <Divider />
-        <p className="site-description-item-profile-p">Company</p>
+        <p className={styles.profileTitle}>Company</p>
         <Row>
           <Col span={12}>
             <DescriptionItem title="Position" content="Programmer" />
@@ -555,7 +579,7 @@ const App: React.FC = () => {
           </Col>
         </Row>
         <Divider />
-        <p className="site-description-item-profile-p">Contacts</p>
+        <p className={styles.profileTitle}>Contacts</p>
         <Row>
           <Col span={12}>
             <DescriptionItem title="Email" content="AntDesign@example.com" />
@@ -567,10 +591,14 @@ const App: React.FC = () => {
         <Row>
           <Col span={24}>
             <DescriptionItem
-              title="Github"
+              title="GitHub"
               content={
-                <a href="http://github.com/ant-design/ant-design/" target="_blank" rel="noreferrer">
-                  github.com/ant-design/ant-design/
+                <a
+                  href="https://github.com/ant-design/ant-design"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  github.com/ant-design/ant-design
                 </a>
               }
             />
@@ -777,7 +805,7 @@ export default App;
 ```tsx
 import React, { useState } from 'react';
 import { Button, Drawer, Flex } from 'antd';
-import type { DrawerProps } from 'antd';
+import type { DrawerProps, GetProp } from 'antd';
 import { createStaticStyles } from 'antd-style';
 const lineStyle: React.CSSProperties = {
   lineHeight: '28px',
@@ -796,18 +824,20 @@ const sharedContent = (
     <div style={lineStyle}>🎨 Powerful theme customization in every detail.</div>
   </>
 );
-const classNames = createStaticStyles(({ css }) => ({
-  container: css`
-    border-radius: 10px;
-    padding: 10px;
-  `,
-}));
+const classNames = createStaticStyles(
+  ({ css }): NonNullable<GetProp<DrawerProps, 'classNames', 'Return'>> => ({
+    root: css`
+      border-radius: 10px;
+      padding: 10px;
+    `,
+  }),
+);
 const styles: DrawerProps['styles'] = {
   mask: {
     backgroundImage: `linear-gradient(to top, #18181b 0, rgba(21, 21, 22, 0.2) 100%)`,
   },
 };
-const stylesFn: DrawerProps['styles'] = (info) => {
+const stylesFn: DrawerProps['styles'] = (info): GetProp<DrawerProps, 'styles', 'Return'> => {
   if (info.props.footer) {
     return {
       header: {
@@ -820,9 +850,8 @@ const stylesFn: DrawerProps['styles'] = (info) => {
         padding: '16px 10px',
         backgroundColor: '#fafafa',
       },
-    } satisfies DrawerProps['styles'];
+    };
   }
-  return {};
 };
 const App: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);

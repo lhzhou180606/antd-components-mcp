@@ -100,7 +100,7 @@ const App: React.FC = () => (
 export default App;
 ```
 ### 弹出位置
-支持 6 个弹出位置。
+支持 12 个弹出位置。
 
 ```tsx
 import React from 'react';
@@ -154,6 +154,28 @@ const App: React.FC = () => (
       </Dropdown>
       <Dropdown menu={{ items }} placement="topRight">
         <Button>topRight</Button>
+      </Dropdown>
+    </Space>
+    <Space wrap>
+      <Dropdown menu={{ items }} placement="leftTop">
+        <Button>leftTop</Button>
+      </Dropdown>
+      <Dropdown menu={{ items }} placement="left">
+        <Button>left</Button>
+      </Dropdown>
+      <Dropdown menu={{ items }} placement="leftBottom">
+        <Button>leftBottom</Button>
+      </Dropdown>
+    </Space>
+    <Space wrap>
+      <Dropdown menu={{ items }} placement="rightTop">
+        <Button>rightTop</Button>
+      </Dropdown>
+      <Dropdown menu={{ items }} placement="right">
+        <Button>right</Button>
+      </Dropdown>
+      <Dropdown menu={{ items }} placement="rightBottom">
+        <Button>rightBottom</Button>
       </Dropdown>
     </Space>
   </Space>
@@ -381,9 +403,6 @@ import React from 'react';
 import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, message, Space } from 'antd';
-const onClick: MenuProps['onClick'] = ({ key }) => {
-  message.info(`Click on item ${key}`);
-};
 const items: MenuProps['items'] = [
   {
     label: '1st menu item',
@@ -398,16 +417,25 @@ const items: MenuProps['items'] = [
     key: '3',
   },
 ];
-const App: React.FC = () => (
-  <Dropdown menu={{ items, onClick }}>
-    <a onClick={(e) => e.preventDefault()}>
-      <Space>
-        Hover me, Click menu item
-        <DownOutlined />
-      </Space>
-    </a>
-  </Dropdown>
-);
+const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const onClick: MenuProps['onClick'] = ({ key }) => {
+    messageApi.info(`Click on item ${key}`);
+  };
+  return (
+    <>
+      {contextHolder}
+      <Dropdown menu={{ items, onClick }}>
+        <a onClick={(e) => e.preventDefault()}>
+          <Space>
+            Hover me, Click menu item
+            <DownOutlined />
+          </Space>
+        </a>
+      </Dropdown>
+    </>
+  );
+};
 export default App;
 ```
 ### 带下拉框的按钮
@@ -418,14 +446,6 @@ import React from 'react';
 import { DownOutlined, EllipsisOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, message, Space, Tooltip } from 'antd';
-const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-  message.info('Click on left button.');
-  console.log('click left button', e);
-};
-const handleMenuClick: MenuProps['onClick'] = (e) => {
-  message.info('Click on menu item.');
-  console.log('click', e);
-};
 const items: MenuProps['items'] = [
   {
     label: '1st menu item',
@@ -451,55 +471,69 @@ const items: MenuProps['items'] = [
     disabled: true,
   },
 ];
-const menuProps = {
-  items,
-  onClick: handleMenuClick,
+const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    messageApi.info('Click on left button.');
+    console.log('click left button', e);
+  };
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    messageApi.info('Click on menu item.');
+    console.log('click', e);
+  };
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
+  return (
+    <>
+      {contextHolder}
+      <Space wrap>
+        <Space.Compact>
+          <Button onClick={handleButtonClick}>Dropdown</Button>
+          <Dropdown menu={menuProps} placement="bottomRight">
+            <Button icon={<EllipsisOutlined />} />
+          </Dropdown>
+        </Space.Compact>
+        <Space.Compact>
+          <Button onClick={handleButtonClick}>Dropdown</Button>
+          <Dropdown menu={menuProps} placement="bottomRight">
+            <Button icon={<UserOutlined />} />
+          </Dropdown>
+        </Space.Compact>
+        <Space.Compact>
+          <Button onClick={handleButtonClick} disabled>
+            Dropdown
+          </Button>
+          <Dropdown menu={menuProps} placement="bottomRight" disabled>
+            <Button icon={<EllipsisOutlined />} disabled />
+          </Dropdown>
+        </Space.Compact>
+        <Space.Compact>
+          <Tooltip title="tooltip">
+            <Button onClick={handleButtonClick}>With Tooltip</Button>
+          </Tooltip>
+          <Dropdown menu={menuProps} placement="bottomRight">
+            <Button loading />
+          </Dropdown>
+        </Space.Compact>
+        <Dropdown menu={menuProps}>
+          <Button onClick={handleButtonClick} icon={<DownOutlined />} iconPlacement="end">
+            Button
+          </Button>
+        </Dropdown>
+        <Space.Compact>
+          <Button onClick={handleButtonClick} danger>
+            Danger
+          </Button>
+          <Dropdown menu={menuProps} placement="bottomRight">
+            <Button icon={<EllipsisOutlined />} danger />
+          </Dropdown>
+        </Space.Compact>
+      </Space>
+    </>
+  );
 };
-const App: React.FC = () => (
-  <Space wrap>
-    <Space.Compact>
-      <Button onClick={handleButtonClick}>Dropdown</Button>
-      <Dropdown menu={menuProps} placement="bottomRight">
-        <Button icon={<EllipsisOutlined />} />
-      </Dropdown>
-    </Space.Compact>
-    <Space.Compact>
-      <Button onClick={handleButtonClick}>Dropdown</Button>
-      <Dropdown menu={menuProps} placement="bottomRight">
-        <Button icon={<UserOutlined />} />
-      </Dropdown>
-    </Space.Compact>
-    <Space.Compact>
-      <Button onClick={handleButtonClick} disabled>
-        Dropdown
-      </Button>
-      <Dropdown menu={menuProps} placement="bottomRight" disabled>
-        <Button icon={<EllipsisOutlined />} disabled />
-      </Dropdown>
-    </Space.Compact>
-    <Space.Compact>
-      <Tooltip title="tooltip">
-        <Button onClick={handleButtonClick}>With Tooltip</Button>
-      </Tooltip>
-      <Dropdown menu={menuProps} placement="bottomRight">
-        <Button loading />
-      </Dropdown>
-    </Space.Compact>
-    <Dropdown menu={menuProps}>
-      <Button onClick={handleButtonClick} icon={<DownOutlined />} iconPlacement="end">
-        Button
-      </Button>
-    </Dropdown>
-    <Space.Compact>
-      <Button onClick={handleButtonClick} danger>
-        Danger
-      </Button>
-      <Dropdown menu={menuProps} placement="bottomRight">
-        <Button icon={<EllipsisOutlined />} danger />
-      </Dropdown>
-    </Space.Compact>
-  </Space>
-);
 export default App;
 ```
 ### 扩展菜单
@@ -918,6 +952,124 @@ const App: React.FC = () => (
 );
 export default App;
 ```
+### 划词操作
+通过 `Dropdown` 和浏览器 Selection API 组合，实现划词后的自定义操作菜单。
+
+```tsx
+import React, { useRef, useState } from 'react';
+import type { MenuProps } from 'antd';
+import { Dropdown, message } from 'antd';
+import { createStyles } from 'antd-style';
+import type { ItemType } from 'antd/es/menu/interface';
+interface SelectionInfo {
+  text: string;
+  x: number;
+  y: number;
+}
+const labels: Record<string, string> = {
+  mask: 'Mask keyword',
+  mark: 'Mark keyword',
+  search: 'Search keyword',
+};
+const useStyle = createStyles(({ cssVar, css }) => {
+  const { colorText, colorBgLayout, borderRadiusLG, paddingLG } = cssVar;
+  return {
+    wrapper: css`
+      padding: ${paddingLG};
+      user-select: text;
+      color: ${colorText};
+      background-color: ${colorBgLayout};
+      border-radius: ${borderRadiusLG};
+    `,
+    trigger: css`
+      position: fixed;
+      display: block;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+    `,
+  };
+});
+const items = Object.entries(labels).map<ItemType>(([key, label]) => ({ key, label }));
+const Demo: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const { styles } = useStyle();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [selection, setSelection] = useState<SelectionInfo | null>(null);
+  const handleSelect = () => {
+    const selectionInstance = window.getSelection();
+    const selectedText = selectionInstance?.toString().trim();
+    if (!selectionInstance || !selectedText || selectionInstance.rangeCount === 0) {
+      setSelection(null);
+      return;
+    }
+    const range = selectionInstance.getRangeAt(0);
+    if (!wrapperRef.current?.contains(range.commonAncestorContainer)) {
+      setSelection(null);
+      return;
+    }
+    const rect = range.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      setSelection(null);
+      return;
+    }
+    setSelection({
+      text: selectedText,
+      x: rect.left + rect.width / 2,
+      y: rect.bottom + 4,
+    });
+  };
+  const handleMouseUp: React.MouseEventHandler<HTMLDivElement> = () => {
+    setTimeout(handleSelect);
+  };
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (!selection) {
+      return;
+    }
+    messageApi.info(`${labels[key]}: ${selection.text}`);
+    window.getSelection()?.removeAllRanges();
+    setSelection(null);
+  };
+  return (
+    <>
+      {contextHolder}
+      <Dropdown
+        menu={{ items, onClick: handleMenuClick }}
+        open={Boolean(selection)}
+        placement="bottom"
+        trigger={[]}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setSelection(null);
+          }
+        }}
+      >
+        <span
+          aria-hidden
+          className={styles.trigger}
+          style={{
+            left: selection?.x ?? -9999,
+            top: selection?.y ?? -9999,
+          }}
+        />
+      </Dropdown>
+      <div
+        ref={wrapperRef}
+        onMouseDown={() => setSelection(null)}
+        onMouseUp={handleMouseUp}
+        className={styles.wrapper}
+      >
+        Select any text in this paragraph to open a Dropdown menu near the selection. This is useful
+        for actions such as masking sensitive words, marking entities, or searching the selected
+        keyword. Example data: Alice, phone 13800138000, ID 110101199001011234.
+      </div>
+    </>
+  );
+};
+export default Demo;
+```
 ### 自定义语义结构的样式和类
 通过 `classNames` 和 `styles` 传入对象/函数可以自定义 Dropdown 的[语义化结构](#semantic-dom)样式。
 
@@ -925,12 +1077,12 @@ export default App;
 import React from 'react';
 import { DownOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Flex, Space } from 'antd';
-import type { DropdownProps, MenuProps } from 'antd';
+import type { DropdownProps, GetProp, MenuProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
     backgroundColor: token.colorFillAlter,
-    border: `1px solid ${token.colorBorder}`,
+    border: `${token.lineWidth}px ${token.lineType} ${token.colorBorder}`,
     borderRadius: token.borderRadius,
   },
 }));
@@ -975,7 +1127,9 @@ const objectStyles: DropdownProps['styles'] = {
     backgroundColor: 'transparent',
   },
 };
-const functionStyles: DropdownProps['styles'] = (info) => {
+const functionStyles: DropdownProps['styles'] = (
+  info,
+): GetProp<DropdownProps, 'styles', 'Return'> => {
   const { props } = info;
   const isClick = props.trigger?.includes('click');
   if (isClick) {
@@ -984,7 +1138,7 @@ const functionStyles: DropdownProps['styles'] = (info) => {
         borderColor: '#1890ff',
         borderRadius: '8px',
       },
-    } satisfies DropdownProps['styles'];
+    };
   }
   return {};
 };

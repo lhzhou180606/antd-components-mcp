@@ -245,6 +245,7 @@ const steps = [
   },
 ];
 const App: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const next = () => {
@@ -260,11 +261,12 @@ const App: React.FC = () => {
     color: token.colorTextTertiary,
     backgroundColor: token.colorFillAlter,
     borderRadius: token.borderRadiusLG,
-    border: `1px dashed ${token.colorBorder}`,
-    marginTop: 16,
+    border: `${token.lineWidth}px dashed ${token.colorBorder}`,
+    marginTop: token.margin,
   };
   return (
     <>
+      {contextHolder}
       <Steps current={current} items={items} />
       <div style={contentStyle}>{steps[current].content}</div>
       <div style={{ marginTop: 24 }}>
@@ -274,7 +276,7 @@ const App: React.FC = () => {
           </Button>
         )}
         {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success('Processing complete!')}>
+          <Button type="primary" onClick={() => messageApi.success('Processing complete!')}>
             Done
           </Button>
         )}
@@ -319,6 +321,60 @@ const App: React.FC = () => (
     <Steps current={1} percent={80} size="small" titlePlacement="vertical" items={items} />
   </>
 );
+export default App;
+```
+### 限量展示
+通过 `maxCount` 限制可见步骤数量，多余步骤会聚合为省略号步骤。
+
+```tsx
+import React from 'react';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import type { InputNumberProps } from 'antd';
+import { Button, Flex, InputNumber, Steps, Typography } from 'antd';
+const genItems = (count: number) =>
+  Array.from({ length: count }, (_, index) => ({ title: `Step ${index + 1}` }));
+const getMiddleCurrent = (count: number) => Math.floor((count - 1) / 2);
+const App: React.FC = () => {
+  const [count, setCount] = React.useState(7);
+  const [current, setCurrent] = React.useState(() => getMiddleCurrent(7));
+  const items = React.useMemo(() => genItems(count), [count]);
+  const handleCountChange: InputNumberProps<number>['onChange'] = (value) => {
+    if (value === null) {
+      return;
+    }
+    setCount(value);
+    setCurrent(getMiddleCurrent(value));
+  };
+  const handlePrev = () => {
+    setCurrent((prev) => Math.max(prev - 1, 0));
+  };
+  const handleNext = () => {
+    setCurrent((prev) => Math.min(prev + 1, count - 1));
+  };
+  return (
+    <Flex vertical gap="middle">
+      <Typography.Title level={5} style={{ margin: 0 }}>
+        Number of Steps
+      </Typography.Title>
+      <Steps current={current} maxCount={5} items={items} />
+      <Flex gap="small" align="center" style={{ alignSelf: 'center' }}>
+        <Button icon={<LeftOutlined />} onClick={handlePrev} disabled={current <= 0} />
+        <InputNumber
+          aria-label="Number of Steps"
+          mode="spinner"
+          min={3}
+          max={7}
+          value={count}
+          onChange={handleCountChange}
+          style={{
+            width: 120,
+          }}
+        />
+        <Button icon={<RightOutlined />} onClick={handleNext} disabled={current >= count - 1} />
+      </Flex>
+    </Flex>
+  );
+};
 export default App;
 ```
 ### 点状步骤条
@@ -676,8 +732,13 @@ export default App;
 ```tsx
 import React from 'react';
 import type { StepsProps } from 'antd';
-import { Avatar, List, Steps } from 'antd';
-const data = [
+import { Avatar, Flex, Listy, Steps, Typography } from 'antd';
+interface DataType {
+  title: string;
+  current: number;
+  status?: StepsProps['status'];
+}
+const data: DataType[] = [
   {
     title: 'Ant Design Title 1',
     current: 0,
@@ -711,24 +772,26 @@ const items = [
   },
 ];
 const App: React.FC = () => (
-  <List
-    itemLayout="horizontal"
-    dataSource={data}
-    renderItem={(item, index) => (
-      <List.Item>
-        <List.Item.Meta
-          avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />}
-          title={<a href="https://ant.design">{item.title}</a>}
-          description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-        />
-        <Steps
-          style={{ marginTop: 8 }}
-          type="inline"
-          current={item.current}
-          status={item.status as StepsProps['status']}
-          items={items}
-        />
-      </List.Item>
+  <Listy<DataType>
+    items={data}
+    rowKey="title"
+    itemRender={(item, index) => (
+      <Flex gap="middle" align="flex-start">
+        <Avatar src={`https://api.dicebear.com/10.x/lorelei/svg?seed=${index}`} />
+        <Flex vertical flex="auto" style={{ minWidth: 0 }}>
+          <a href="https://ant.design">{item.title}</a>
+          <Typography.Text type="secondary">
+            Ant Design, a design language for background applications, is refined by Ant UED Team
+          </Typography.Text>
+          <Steps
+            style={{ marginTop: 8 }}
+            type="inline"
+            current={item.current}
+            status={item.status}
+            items={items}
+          />
+        </Flex>
+      </Flex>
     )}
   />
 );
@@ -997,7 +1060,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, Steps } from 'antd';
-import type { StepsProps } from 'antd';
+import type { GetProp, StepsProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
@@ -1010,13 +1073,13 @@ const stylesObject: StepsProps['styles'] = {
   itemIcon: { borderRadius: '30%' },
   itemContent: { fontStyle: 'italic' },
 };
-const stylesFn: StepsProps['styles'] = (info) => {
+const stylesFn: StepsProps['styles'] = (info): GetProp<StepsProps, 'styles', 'Return'> => {
   if (info.props.type === 'navigation') {
     return {
       root: {
         borderColor: '#1890ff',
       },
-    } satisfies StepsProps['styles'];
+    };
   }
   return {};
 };

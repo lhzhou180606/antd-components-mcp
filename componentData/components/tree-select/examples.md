@@ -578,7 +578,7 @@ const App: React.FC = () => {
       multiple
       maxCount={MAX_COUNT}
       style={{ width: '100%' }}
-      suffixIcon={suffix}
+      suffix={suffix}
       treeCheckable
       placeholder="Please select"
       showCheckedStrategy={TreeSelect.SHOW_CHILD}
@@ -588,7 +588,7 @@ const App: React.FC = () => {
 export default App;
 ```
 ### 前后缀
-自定义前缀 `prefix` 和后缀图标 `suffixIcon`。
+自定义前缀 `prefix` 和后缀 `suffix`。
 
 ```tsx
 import React, { useState } from 'react';
@@ -637,7 +637,7 @@ const App: React.FC = () => {
     <>
       <TreeSelect
         showSearch
-        suffixIcon={icon}
+        suffix={icon}
         style={{ width: '100%' }}
         value={value}
         styles={{
@@ -680,7 +680,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { Flex, TreeSelect } from 'antd';
-import type { TreeSelectProps } from 'antd';
+import type { GetProp, TreeSelectProps } from 'antd';
 import { createStyles } from 'antd-style';
 const useStyles = createStyles(({ token }) => ({
   root: {
@@ -701,7 +701,9 @@ const styleObject: TreeSelectProps['styles'] = {
     },
   },
 };
-const styleFunction: TreeSelectProps['styles'] = (info) => {
+const styleFunction: TreeSelectProps['styles'] = (
+  info,
+): GetProp<TreeSelectProps, 'styles', 'Return'> => {
   if (info.props.size === 'medium') {
     return {
       suffix: {
@@ -712,7 +714,7 @@ const styleFunction: TreeSelectProps['styles'] = (info) => {
           color: '#722ed1',
         },
       },
-    } satisfies TreeSelectProps['styles'];
+    };
   }
   return {};
 };
